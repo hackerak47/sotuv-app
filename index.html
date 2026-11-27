@@ -6,61 +6,63 @@
 <title>7-bog'lama sotuv</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0B1220;--card:#131C2E;--line:#1F2B42;--track:#22304A;--text:#E8EDF5;--muted:#9AA7BA;--dim:#6B7A92;--soft:#C9D3E1;
-  --green:#2EC4A0;--green2:#5BE0B9;--greenbg:#10261F;--greenline:#1C4236;--orange:#F5B35C;--orangebg:#2A1E10;--orangeline:#4A3518;
-  --red:#F27A84;--redbg:#2E1518}
-*{box-sizing:border-box}
+:root{--bg:#EEF2F7;--card:#fff;--line:#E7ECF3;--track:#EEF1F6;--text:#0F172A;--muted:#64748B;--dim:#94A0B4;--soft:#334155;
+  --green:#10B981;--green2:#059669;--teal:#0F766E;--greenbg:#ECFDF5;--orange:#D97706;--orange2:#F59E0B;--orangebg:#FFF7E6;
+  --red:#E5484D;--redbg:#FEF0F0;--blue:#3B82F6;--bluebg:#EFF6FF}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-.wrap{max-width:480px;margin:0 auto;padding:16px 16px 96px;display:flex;flex-direction:column;gap:14px}
-.h{font-family:'Space Grotesk',sans-serif}
-.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px}
-.ttl{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px}
-.row{display:flex;align-items:center;gap:12px}
-.between{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
-.muted{color:var(--muted)}.dim{color:var(--dim)}.soft{color:var(--soft)}
-.small{font-size:12px}.xs{font-size:11px}
-.big{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:28px;line-height:1.1}
-.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.kpi{border-radius:18px;padding:14px;border:1px solid var(--line);background:var(--card)}
-.kpi.g{background:var(--greenbg);border-color:var(--greenline)}.kpi.o{background:var(--orangebg);border-color:var(--orangeline)}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
-.bars{height:130px;display:flex;align-items:flex-end;gap:3px;margin-top:16px;border-bottom:1px solid var(--track)}
-.bar{flex:1;height:0;border-radius:4px 4px 0 0;transition:height .9s cubic-bezier(.2,.8,.2,1)}
+button,input{font:inherit;color:inherit}
+.wrap{max-width:520px;margin:0 auto;padding:14px 14px 104px;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border-radius:20px;padding:16px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 6px 18px rgba(15,23,42,.06)}
+.ttl{font-weight:800;font-size:17px;letter-spacing:-.01em}
+.lbl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.num{font-weight:800;font-size:30px;line-height:1.05;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.row{display:flex;align-items:center;gap:10px}.between{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.muted{color:var(--muted)}.dim{color:var(--dim)}.small{font-size:13px}.xs{font-size:12px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kpi{padding:14px}
 .track{height:10px;background:var(--track);border-radius:999px;overflow:hidden;display:flex}
-.fill{height:100%;width:0;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
-.top{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
-.medal{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
-.ellip{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chip{font-size:11px;color:var(--muted);background:#151F31;border:1px solid #22304A;border-radius:999px;padding:6px 10px;white-space:nowrap}
-nav{position:fixed;left:0;right:0;bottom:0;padding:8px 16px calc(8px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 30%)}
-nav .in{max-width:480px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:6px}
-nav button{min-height:44px;border:0;border-radius:13px;background:transparent;color:var(--soft);font:600 14px Inter,sans-serif;cursor:pointer}
-nav button.on{background:var(--green);color:#062019}
-.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--soft);display:flex;align-items:center;justify-content:center;cursor:pointer}
-.sk{background:linear-gradient(90deg,#131C2E,#1A2539,#131C2E);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:22px}
+.fill{height:100%;width:0;border-radius:999px;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;color:var(--soft);white-space:nowrap;cursor:pointer}
+.chip.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.chips::-webkit-scrollbar{display:none}
+.search{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:11px 14px;font-size:15px;outline:none}
+.search:focus{border-color:var(--green)}
+.item{padding:12px 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:3px}
+.item:first-child{border-top:0}
+.tag{font-size:11px;font-weight:700;border-radius:999px;padding:3px 8px;white-space:nowrap}
+.t-red{color:#B42318;background:var(--redbg)}.t-or{color:#B45309;background:var(--orangebg)}.t-gr{color:#047857;background:var(--greenbg)}.t-bl{color:#1D4ED8;background:var(--bluebg)}.t-gy{color:#475569;background:#F1F5F9}
+.medal{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0}
+.ellip{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:0;background:#fff;color:var(--soft);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 1px 2px rgba(15,23,42,.06)}
+.more{width:100%;border:1px dashed #CBD5E1;background:transparent;border-radius:12px;padding:11px;font-weight:600;color:var(--soft);cursor:pointer;margin-top:6px}
+nav{position:fixed;left:0;right:0;bottom:0;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:linear-gradient(rgba(238,242,247,0),var(--bg) 35%)}
+nav .in{max-width:520px;margin:0 auto;display:flex;gap:4px;background:#fff;border-radius:20px;padding:6px;box-shadow:0 8px 28px rgba(15,23,42,.14);overflow-x:auto;scrollbar-width:none}
+nav .in::-webkit-scrollbar{display:none}
+nav button{flex:1 1 0;min-width:0;min-height:52px;border:0;border-radius:14px;background:transparent;color:var(--muted);font-size:10.5px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:4px 2px;white-space:nowrap}
+nav button.on{background:var(--teal);color:#fff}
+nav svg{width:22px;height:22px}
+.sk{background:linear-gradient(90deg,#fff,#F3F6FA,#fff);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:20px}
 @keyframes sk{to{background-position:-200% 0}}
-.fade{animation:fade .5s ease both}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.idle{background:#1A1422;border:1px solid #3A2430;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px;margin-top:10px}
-.idle.bor{background:#1E1A10;border-color:#4A3518}
-.tag{font-size:11px;border-radius:999px;padding:2px 8px}
+.fade{animation:fade .45s ease both}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.grow{transform:scaleY(0);transform-origin:bottom;transform-box:fill-box;transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.chartbox{overflow-x:auto;scrollbar-width:thin;margin:6px -4px 0;padding:0 4px}
 .hidden{display:none!important}
 </style>
 </head>
 <body>
 <div class="wrap" id="app">
-  <div class="sk" style="height:56px"></div><div class="sk" style="height:164px"></div>
-  <div class="sk" style="height:200px"></div><div class="sk" style="height:250px"></div>
+  <div class="sk" style="height:52px"></div><div class="sk" style="height:150px"></div>
+  <div class="sk" style="height:180px"></div><div class="sk" style="height:240px"></div>
 </div>
-<nav id="nav" class="hidden"><div class="in">
-  <button id="t-umumiy" class="on" type="button">Umumiy</button>
-  <button id="t-men" type="button">Mening sotuvlarim</button>
-</div></nav>
+<nav id="nav" class="hidden"><div class="in" id="navin"></div></nav>
 
 <script>
-// Ma'lumot manbai: Google Apps Script (u Telegram imzosini tekshiradi va Google Sheets'dan hisoblaydi)
-// Manzilni bot o'zi beradi (?api=...), shuning uchun Apps Script yangi manzilga ko'chsa sahifani qayta yuklash shart emas
+// Ma'lumot manbai: Google Apps Script (Telegram imzosini tekshiradi va Google Sheets'dan hisoblaydi).
+// Manzilni bot o'zi beradi (?api=...), shuning uchun Apps Script yangi manzilga ko'chsa sahifani qayta yuklash shart emas.
 const API = (() => {
   const a = new URLSearchParams(location.search).get("api") || "";
   return a.startsWith("https://script.google.com/macros/s/") ? a
@@ -69,218 +71,355 @@ const API = (() => {
 const tg = window.Telegram && window.Telegram.WebApp;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-let DATA = null, TAB = "umumiy";
+const fmt = (n) => Number(n || 0).toLocaleString("ru-RU");
+let D = null, TAB = "umumiy";
+const F = { idle: { tur: "all", tuman: "all", q: "", n: 40 }, active: { tuman: "all", q: "", n: 40 }, reyt: { tuman: "all", q: "" } };
 
-if (tg) { tg.ready(); tg.expand(); try { tg.setHeaderColor("#0B1220"); tg.setBackgroundColor("#0B1220"); } catch (e) {} }
+if (tg) { tg.ready(); tg.expand(); try { tg.setHeaderColor("#EEF2F7"); tg.setBackgroundColor("#EEF2F7"); tg.setBottomBarColor && tg.setBottomBarColor("#EEF2F7"); } catch (e) {} }
+
+// ---------- Ikonkalar
+const IC = {
+  umumiy: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/>',
+  bugun: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M12 14v3l2 1"/>',
+  reja: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+  idle: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/>',
+  active: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+  reyting: '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>',
+  men: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+};
+const icon = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;
 
 // ---------- Animatsiyalar
-function sanash(root) {
+function animatsiya(root) {
   root.querySelectorAll("[data-n]").forEach((el) => {
-    const n = Number(el.dataset.n), s = performance.now(), d = 1300, suf = el.dataset.suf || "";
-    const step = (t) => {
-      const k = Math.min(1, (t - s) / d), e = 1 - Math.pow(1 - k, 3);
-      el.textContent = Math.round(n * e).toLocaleString("ru-RU") + suf;
-      if (k < 1) requestAnimationFrame(step);
-    };
+    const n = Number(el.dataset.n), s = performance.now(), dur = 1200, suf = el.dataset.suf || "";
+    const step = (t) => { const k = Math.min(1, (t - s) / dur), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = fmt(Math.round(n * e)) + suf; if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   });
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    root.querySelectorAll("[data-h]").forEach((el) => (el.style.height = el.dataset.h + "px"));
     root.querySelectorAll("[data-w]").forEach((el) => (el.style.width = el.dataset.w + "%"));
     root.querySelectorAll("[data-dash]").forEach((el) => (el.style.strokeDashoffset = el.dataset.dash));
+    root.querySelectorAll(".grow").forEach((el, i) => setTimeout(() => (el.style.transform = "scaleY(1)"), i * 18));
   }));
+  root.querySelectorAll(".chartbox").forEach((el) => (el.scrollLeft = el.scrollWidth));
 }
 const N = (v, suf = "") => `<span data-n="${Number(v) || 0}" data-suf="${suf}">0${suf}</span>`;
-const medal = [["#3A2F0E", "#F5C542"], ["#2A2F38", "#D6DCE5"], ["#33220F", "#E0A066"]];
+const pct = (a, b) => (b ? Math.round(a * 100 / b) : 0);
+const medal = [["#FEF3C7", "#B45309"], ["#F1F5F9", "#475569"], ["#FFEDD5", "#C2410C"]];
 
-function halqa(foiz) {
-  const C = 2 * Math.PI * 52, off = C * (1 - Math.min(100, foiz) / 100);
-  return `<svg width="128" height="128" viewBox="0 0 128 128" aria-hidden="true">
-    <circle cx="64" cy="64" r="52" fill="none" stroke="#22304A" stroke-width="12"/>
-    <circle cx="64" cy="64" r="52" fill="none" stroke="#2EC4A0" stroke-width="12" stroke-linecap="round"
+function halqa(foiz, size = 120, stroke = 12, rang = "#10B981", fon = "#EEF1F6") {
+  const r = (size - stroke) / 2, C = 2 * Math.PI * r, off = C * (1 - Math.min(100, foiz) / 100);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">
+    <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${fon}" stroke-width="${stroke}"/>
+    <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${rang}" stroke-width="${stroke}" stroke-linecap="round"
       stroke-dasharray="${C.toFixed(1)}" style="stroke-dashoffset:${C.toFixed(1)};transition:stroke-dashoffset 1.3s cubic-bezier(.2,.8,.2,1)"
-      data-dash="${off.toFixed(1)}" transform="rotate(-90 64 64)"/></svg>`;
+      data-dash="${off.toFixed(1)}" transform="rotate(-90 ${size / 2} ${size / 2})"/></svg>`;
 }
 
-function ustunlar(kunlik) {
-  const max = Math.max(1, ...kunlik);
-  const rek = kunlik.indexOf(Math.max(...kunlik));
-  return `<div class="bars">${kunlik.map((v, i) =>
-    `<div class="bar" title="${i + 1}-kun: ${v}" style="background:${v === 0 ? "#22304A" : (i === rek ? "#F5B35C" : "#2EC4A0")}" data-h="${v ? Math.max(4, v / max * 120) : 2}"></div>`).join("")}</div>
-    <div class="between xs dim" style="margin-top:6px"><span>1</span><span>${Math.ceil(kunlik.length / 2)}</span><span>${kunlik.length}</span></div>`;
+// ---------- Sana yordamchilari
+function sanaQism() { const [k, o, y] = D.sana.split(".").map(Number); return { k, o, y }; }
+const HK = ["Ya", "Du", "Se", "Ch", "Pa", "Ju", "Sh"];
+function haftaKuni(d) { const { o, y } = sanaQism(); return new Date(y, o - 1, d).getDay(); }
+function qolganIshKuni() { const { k, o, y } = sanaQism(); const oxir = new Date(y, o, 0).getDate(); let n = 0;
+  for (let d = k + 1; d <= oxir; d++) if (new Date(y, o - 1, d).getDay() !== 0) n++; return n; }
+
+// ---------- Kunlik grafik: har ustun ustida son, ostida sana va hafta kuni; yakshanbalar ajratilgan
+function grafik(kunlik, ortacha, rang = "#10B981") {
+  const slot = 30, bw = 18, H = 210, T = 26, B = 46, ph = H - T - B, n = kunlik.length, W = n * slot + 8;
+  const max = Math.max(10, ...kunlik), ymax = Math.ceil(max * 1.1);
+  const rek = Math.max(...kunlik), y = (v) => T + ph - (v / ymax) * ph;
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Kunlik sotuvlar grafigi" style="display:block">`;
+  s += `<defs><pattern id="chiz" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#D1FAE5"/><rect width="3" height="8" fill="${rang}"/></pattern></defs>`;
+  kunlik.forEach((v, i) => { if (haftaKuni(i + 1) === 0) s += `<rect x="${i * slot + 4}" y="${T - 6}" width="${slot}" height="${ph + 6}" fill="#F3F5F9" rx="4"/>`; });
+  s += `<line x1="0" x2="${W}" y1="${T + ph}" y2="${T + ph}" stroke="#E2E8F0" stroke-width="1.5"/>`;
+  kunlik.forEach((v, i) => {
+    const d = i + 1, x = i * slot + 4 + (slot - bw) / 2, cx = i * slot + 4 + slot / 2, bugun = d === n, yak = haftaKuni(d) === 0;
+    const f = bugun ? "url(#chiz)" : (v === rek && v > 0 ? "#F59E0B" : rang);
+    if (v) {
+      s += `<rect class="grow" x="${x}" y="${y(v).toFixed(1)}" width="${bw}" height="${(T + ph - y(v)).toFixed(1)}" rx="5" fill="${f}"${bugun ? ` stroke="${rang}" stroke-width="1.5"` : ""}/>`;
+      s += `<text x="${cx}" y="${(y(v) - 6).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="${v === rek ? "#B45309" : "#1E293B"}">${v}</text>`;
+    } else s += `<text x="${cx}" y="${T + ph - 5}" text-anchor="middle" font-size="11" fill="#CBD5E1">–</text>`;
+    s += `<text x="${cx}" y="${T + ph + 18}" text-anchor="middle" font-size="12" font-weight="${bugun ? 800 : 600}" fill="${bugun ? "#0F766E" : "#334155"}">${d}</text>`;
+    s += `<text x="${cx}" y="${T + ph + 34}" text-anchor="middle" font-size="10" fill="${yak ? "#E5484D" : "#94A0B4"}">${HK[haftaKuni(d)]}</text>`;
+  });
+  if (ortacha) s += `<line x1="0" x2="${W}" y1="${y(ortacha).toFixed(1)}" y2="${y(ortacha).toFixed(1)}" stroke="#3B82F6" stroke-width="1.5" stroke-dasharray="6 5"/>`;
+  return `<div class="chartbox">${s}</svg></div>
+    <div class="row xs muted" style="flex-wrap:wrap;gap:12px;margin-top:8px">
+      <span><span class="dot" style="background:${rang}"></span>sotuv</span><span><span class="dot" style="background:#F59E0B"></span>rekord</span>
+      <span><span class="dot" style="background:#F3F5F9;outline:1px solid #E2E8F0"></span>yakshanba</span>
+      ${ortacha ? `<span><span style="display:inline-block;width:14px;border-top:2px dashed #3B82F6;margin-right:6px;vertical-align:3px"></span>o'rtacha ${ortacha}/kun</span>` : ""}</div>`;
+}
+function haftalar(kunlik) {
+  const h = []; let joriy = null;
+  kunlik.forEach((v, i) => { const d = i + 1, hk = haftaKuni(d);
+    if (!joriy || hk === 1) { joriy = { bosh: d, oxir: d, son: 0 }; h.push(joriy); }
+    joriy.oxir = d; joriy.son += v; });
+  if (h.length > 1 && h[0].oxir === h[0].bosh) { h[1].bosh = h[0].bosh; h[1].son += h[0].son; h.shift(); }  // oy yakshanbadan boshlansa
+  const eng = Math.max(...h.map((x) => x.son));
+  return `<div class="grid2" style="margin-top:10px">${h.map((x, i) => {
+    const oxirgi = i === h.length - 1, eng1 = x.son === eng && !oxirgi;
+    return `<div style="border-radius:12px;padding:9px 11px;font-size:12px;background:${eng1 ? "#FEF3C7" : oxirgi ? "#ECFDF5" : "#F6F8FB"};color:${eng1 ? "#92400E" : oxirgi ? "#047857" : "#475569"}">
+      ${x.bosh}–${x.oxir}: <b style="font-size:15px;color:#0F172A">${x.son}</b> ta${eng1 ? " · eng yaxshi" : oxirgi ? " · hozircha" : ""}</div>`; }).join("")}</div>`;
 }
 
-function osish(kunlik) {
-  const W = 320, H = 150, n = kunlik.length; let jam = 0;
-  const jami = Math.max(1, kunlik.reduce((a, b) => a + b, 0));
-  const pts = kunlik.map((v, i) => { jam += v; return [n > 1 ? i * W / (n - 1) : 0, 140 - jam / jami * 120]; });
-  const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
-  const last = pts[pts.length - 1] || [0, 140];
-  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Sotuvlarim o'sish grafigi" style="display:block;margin-top:14px;overflow:visible">
-    <line x1="0" y1="140" x2="${W}" y2="140" stroke="#22304A"/><line x1="0" y1="80" x2="${W}" y2="80" stroke="#1A2539" stroke-dasharray="3 4"/>
-    <path d="${d} L${last[0].toFixed(1)} 140 L0 140 Z" fill="#2EC4A0" fill-opacity=".14"/>
-    <path d="${d}" fill="none" stroke="#2EC4A0" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"
-      stroke-dasharray="1200" style="stroke-dashoffset:1200;transition:stroke-dashoffset 1.6s ease" data-dash="0"/>
-    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="5" fill="#0B1220" stroke="#5BE0B9" stroke-width="3"/></svg>`;
+// ---------- Umumiy bloklar
+function sarlavha() {
+  return `<header class="between fade">
+    <div class="row" style="gap:10px;min-width:0">
+      <div style="width:42px;height:42px;border-radius:13px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:21px;flex-shrink:0">7</div>
+      <div style="min-width:0"><div style="font-weight:800;font-size:17px;white-space:nowrap">7-bog'lama sotuv</div>
+      <div class="xs muted" style="white-space:nowrap">${esc(D.oy)} · ${esc(D.sana.slice(0, 5))}${D.sbms ? ` · SBMS ${esc(D.sbms.slice(0, 5))}` : ""}</div></div></div>
+    <button class="iconbtn" type="button" onclick="yukla(true)" aria-label="Yangilash"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path d="M21 3v5h-5"/></svg></button></header>`;
 }
-
-// ---------- Sahifalar
-function sarlavha(D) {
-  return `<header class="row fade" style="justify-content:space-between">
-    <div class="row" style="gap:10px">
-      <div class="h" style="width:40px;height:40px;border-radius:12px;background:var(--green);color:#062019;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px">7</div>
-      <div style="min-width:0"><div class="h" style="font-weight:700;font-size:17px;white-space:nowrap">7-bog'lama sotuv</div>
-      <div class="small muted" style="white-space:nowrap">${esc(D.oy)} · ${esc(D.sana.slice(0, 5))}</div></div>
-    </div>
-    <div class="row" style="gap:8px">${D.sbms ? `<span class="chip" title="SBMS bilan oxirgi sinxronizatsiya">SBMS ${esc(D.sbms.slice(0, 5))}</span>` : ""}
-      <button class="iconbtn" type="button" onclick="yukla(true)" aria-label="Yangilash">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path d="M21 3v5h-5"/></svg>
-      </button></div></header>`;
-}
-
-function rejaKarta(R) {
-  if (!R) return `<section class="card fade small muted">Bu oy uchun reja hali kiritilmagan.</section>`;
-  const qolgan = R.qolgan > 0
-    ? `Qolgan <b>${N(R.qolgan)}</b> ta${R.qolganKun > 0 ? ` · ${R.qolganKun} kun · kuniga ~${R.kuniga}` : ""}`
-    : `<b style="color:var(--green2)">Reja bajarildi!</b>`;
-  return `<section class="card fade row" style="gap:16px">
-    <div style="position:relative;width:128px;height:128px;flex-shrink:0">${halqa(R.foiz)}
+function rejaHero(R) {
+  if (!R) return `<section class="card fade small muted">Bu oy uchun reja hali kiritilmagan (botda: 📊 Hisobotlar → 🎯 Oylik reja).</section>`;
+  return `<section class="card fade row" style="background:linear-gradient(135deg,#0F766E,#0B5E58);color:#fff;gap:16px">
+    <div style="position:relative;width:116px;height:116px;flex-shrink:0">${halqa(R.foiz, 116, 12, "#5EEAD4", "rgba(255,255,255,.18)")}
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-        <div class="h" style="font-weight:700;font-size:30px;line-height:1">${N(R.foiz, "%")}</div><div class="xs muted" style="margin-top:4px">bajarildi</div></div></div>
-    <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
-      <div class="small muted" style="text-transform:uppercase;letter-spacing:.06em">Oylik reja</div>
-      <div class="big" style="font-size:26px">${N(R.bajarildi)} <span class="dim" style="font-size:18px">/ ${R.jami}</span></div>
-      <div class="small" style="color:var(--orange)"><span class="dot" style="background:var(--orange)"></span>puli bor idle: ${N(R.puliBor)}</div>
-      <div class="small soft">${qolgan}</div></div></section>`;
+        <div style="font-weight:800;font-size:28px;line-height:1">${N(R.foiz, "%")}</div><div class="xs" style="color:#CCFBF1;margin-top:3px">bajarildi</div></div></div>
+    <div style="min-width:0;display:flex;flex-direction:column;gap:6px">
+      <div class="lbl" style="color:#A7F3D0">Oylik reja</div>
+      <div style="font-weight:800;font-size:26px;line-height:1">${N(R.bajarildi)} <span style="font-size:16px;color:#99F6E4">/ ${fmt(R.jami)}</span></div>
+      <div class="xs" style="color:#FDE68A"><span class="dot" style="background:#FCD34D"></span>puli bor idle: ${R.puliBor}</div>
+      <div class="small" style="color:#CCFBF1">${R.qolgan > 0 ? `Qolgan <b style="color:#fff">${fmt(R.qolgan)}</b> · ${R.qolganKun} kun · kuniga ~${R.kuniga}` : "<b>Reja bajarildi! 🎉</b>"}</div></div></section>`;
 }
+function kpi(lbl, v, sub, rang = "") { return `<div class="card kpi"><div class="lbl">${lbl}</div><div class="num" style="margin-top:6px;${rang ? "color:" + rang : ""}">${N(v)}</div><div class="xs muted" style="margin-top:4px">${sub}</div></div>`; }
+function yettiKun(k) { const s = k.slice(Math.max(0, k.length - 8), k.length - 1), o = k.slice(Math.max(0, k.length - 15), Math.max(0, k.length - 8));
+  const a = s.reduce((x, y) => x + y, 0), b = o.reduce((x, y) => x + y, 0); return { a, b, f: b ? Math.round((a - b) * 100 / b) : 0 }; }
 
-function umumiySahifa(D) {
-  const U = D.umumiy, R = D.reja;
-  const tumanlar = R && R.tumanlar.length ? R.tumanlar : null;
-  let h = sarlavha(D) + rejaKarta(R);
+function sahifaUmumiy() {
+  const U = D.umumiy, R = D.reja, y7 = yettiKun(U.kunlik);
+  let h = sarlavha() + rejaHero(R);
   h += `<section class="grid2 fade">
-    <div class="kpi"><div class="small muted">Jami sotuv</div><div class="big" style="margin-top:6px">${N(U.jami)}</div><div class="xs dim">shu oy shartnomalari</div></div>
-    <div class="kpi g"><div class="small" style="color:#8FD9C3">Active</div><div class="big" style="margin-top:6px;color:var(--green2)">${N(U.active)}</div><div class="xs" style="color:#8FD9C3">${U.oldingiActive ? `shundan oldingi oy: ${U.oldingiActive}` : "ulangan abonentlar"}</div></div>
-    <div class="kpi o"><div class="small" style="color:#F2C48A">Idle</div><div class="big" style="margin-top:6px;color:var(--orange)">${N(U.idle)}</div><div class="xs" style="color:#F2C48A">puli yo'q: ${N(U.puliYoq)}</div></div>
-    <div class="kpi"><div class="small muted">Bugun</div><div class="big" style="margin-top:6px">${N(U.bugun)}</div><div class="xs dim">kecha: ${U.kecha} · ulandi: ${U.bugunUlangan}</div></div></section>`;
-  h += `<section class="card fade"><div class="between"><div class="ttl">Kunlik sotuvlar</div>
-    ${U.rekord.son ? `<div class="small muted">rekord: ${U.rekord.son} · ${U.rekord.kun}-kun</div>` : ""}</div>
-    ${ustunlar(U.kunlik)}
-    <div class="row small soft" style="gap:16px;margin-top:12px"><span>O'rtacha: <b>${U.ortacha}</b>/ish kuni</span></div></section>`;
-  if (tumanlar) {
+    ${kpi("Bugun sotuv", U.bugun, `kecha: ${U.kecha}`)}
+    ${kpi("Bugun ulandi", U.bugunUlangan, "active bo'ldi", "var(--green2)")}
+    ${kpi("Oy bo'yicha sotuv", U.jami, "shu oy shartnomalari")}
+    ${kpi("Active", U.active, U.oldingiActive ? `shundan oldingi oy: ${U.oldingiActive}` : "ulangan", "var(--green2)")}
+    ${kpi("Idle", U.idle, `<b style="color:var(--red)">${U.puliYoq}</b> puli yo'q · <b style="color:var(--orange)">${U.idle - U.puliYoq}</b> puli bor`, "var(--orange)")}
+    ${kpi("Oxirgi 7 kun", y7.a, y7.b ? `<b style="color:${y7.f >= 0 ? "var(--green2)" : "var(--red)"}">${y7.f >= 0 ? "▲" : "▼"} ${Math.abs(y7.f)}%</b> oldingi 7 kundan` : "sotuv")}</section>`;
+  h += `<section class="card fade"><div class="between"><div><div class="ttl">Kunlik sotuvlar</div><div class="xs muted">Har bir ustun — o'sha kuni kiritilgan sotuvlar soni</div></div>
+    ${U.rekord.son ? `<span class="tag t-or">rekord ${U.rekord.son} · ${U.rekord.kun}-kun</span>` : ""}</div>
+    ${grafik(U.kunlik, U.ortacha)}${haftalar(U.kunlik)}</section>`;
+  if (R && R.tumanlar.length) {
     h += `<section class="card fade" style="display:flex;flex-direction:column;gap:14px"><div class="ttl">Tumanlar bo'yicha reja</div>
-      ${tumanlar.map((t) => `<div><div class="between" style="font-size:13px"><b>${esc(t.nom)}</b>
-        <span class="soft">${N(t.son)} / ${t.reja} · <b style="color:var(--green2)">${N(t.foiz, "%")}</b></span></div>
-        <div class="track" style="margin-top:8px"><div class="fill" style="background:var(--green)" data-w="${Math.min(100, t.son * 100 / t.reja).toFixed(1)}"></div></div>
-        <div class="xs" style="color:#F2C48A;margin-top:6px"><span class="dot" style="background:var(--orange)"></span>puli bor idle: ${t.puliBor}</div></div>`).join("")}
-      ${R.oldingiOy ? `<div class="xs dim">Oldingi oy shartnomalari (rejaga kirmaydi): ${R.oldingiOy} ta</div>` : ""}
-      ${Object.keys(R.tashqari || {}).length ? `<div class="xs dim">Rejadan tashqari tariflar: ${Object.entries(R.tashqari).map(([k, v]) => esc(k) + " " + v).join(" · ")}</div>` : ""}
-    </section>`;
-  } else {
-    h += `<section class="card fade" style="display:flex;flex-direction:column;gap:12px"><div class="ttl">Tumanlar</div>
-      ${D.tumanlar.map((t) => `<div class="between small"><b>${esc(t.nom)}</b><span class="soft">${t.jami} ta · <span style="color:var(--green2)">${t.active} active</span> · <span style="color:var(--orange)">${t.idle} idle</span></span></div>`).join("")}</section>`;
+      ${R.tumanlar.map((t) => { const tm = D.tumanlar.find((x) => x.nom === t.nom) || {};
+        return `<div><div class="between small"><b>${esc(t.nom)}</b><span>${N(t.son)} / ${t.reja} · <b style="color:${t.foiz >= 80 ? "var(--green2)" : "var(--orange)"}">${N(t.foiz, "%")}</b></span></div>
+        <div class="track" style="margin-top:7px"><div class="fill" style="background:${t.foiz >= 80 ? "var(--green)" : "var(--orange2)"}" data-w="${Math.min(100, t.son * 100 / t.reja).toFixed(1)}"></div></div>
+        <div class="xs muted" style="margin-top:6px">sotuv ${tm.jami ?? "–"} · <span style="color:var(--green2)">active ${tm.active ?? "–"}</span> · <span style="color:var(--orange)">idle ${tm.idle ?? "–"}</span> · puli bor idle ${t.puliBor}</div></div>`; }).join("")}</section>`;
   }
-  h += `<section class="card fade"><div class="ttl" style="margin-bottom:10px">TOP 5 sotuvchi</div>
-    ${D.top.map((o, i) => `<div class="top"><div class="medal" style="background:${(medal[i] || ["#1C2638"])[0]};color:${(medal[i] || ["", "#C9D3E1"])[1]}">${i + 1}</div>
-      <div style="flex:1;min-width:0"><div class="ellip" style="font-size:14px;font-weight:600">${esc(o.nom)}</div><div class="xs muted">${esc(o.tuman)}</div></div>
-      <div class="h" style="font-weight:700;font-size:18px">${N(o.son)}</div></div>`).join("")}</section>`;
+  h += `<section class="card fade"><div class="between" style="margin-bottom:4px"><div class="ttl">TOP 5 sotuvchi</div><span class="xs muted">shu oy</span></div>
+    ${D.top.map((o, i) => `<div class="row" style="padding:9px 0;${i ? "border-top:1px solid var(--line)" : ""}">
+      <div class="medal" style="background:${(medal[i] || ["#F8FAFC"])[0]};color:${(medal[i] || ["", "#64748B"])[1]}">${i + 1}</div>
+      <div style="flex:1" class="ellip"><div style="font-weight:700;font-size:15px" class="ellip">${esc(o.nom)}</div><div class="xs muted">${esc(o.tuman)}</div></div>
+      <div style="font-weight:800;font-size:20px">${N(o.son)}</div></div>`).join("")}</section>`;
   return h;
 }
 
-function menSahifa(D) {
+// ---------- Mening sotuvlarim
+function sahifaMen() {
   const M = D.men;
-  if (!M) return sarlavha(D) + `<section class="card fade"><div class="ttl">Mening sotuvlarim</div>
-    <p class="small muted" style="margin:10px 0 0">Siz admin sifatida kirdingiz — shaxsiy sotuvlar yo'q. Botda xodim sifatida ro'yxatdan o'tsangiz, bu yerda o'z sotuvlaringiz chiqadi.</p></section>`;
-  const bosh = M.qisqa.split(" ").map((s) => s[0] || "").join("").slice(0, 2).toUpperCase();
-  const T = M.tumanReja;
-  let h = `<header class="row fade">
-    <div class="h" style="width:48px;height:48px;border-radius:16px;background:#1C3A33;color:var(--green2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px">${esc(bosh)}</div>
-    <div style="flex:1;min-width:0"><div class="h ellip" style="font-weight:700;font-size:18px">${esc(M.qisqa)}</div>
-      <div class="small muted">${esc(M.tuman)} · ${esc(D.oy)}</div></div>
-    ${M.orin ? `<div style="text-align:center;background:#3A2F0E;border-radius:14px;padding:8px 12px">
-      <div class="h" style="font-weight:700;font-size:18px;color:#F5C542;line-height:1">${N(M.orin)}</div>
-      <div style="font-size:10px;color:#F2D98A;margin-top:2px">-o'rin / ${M.operatorlar}</div></div>` : ""}</header>`;
-  h += `<section class="card fade grid2" style="gap:12px">
-    <div><div class="small muted">Bugun</div><div class="big" style="font-size:34px">${N(M.bugun)}</div><div class="xs dim">kecha: ${M.kecha} ta</div></div>
-    <div><div class="small muted">Shu oy</div><div class="big" style="font-size:34px">${N(M.oy)}</div><div class="xs dim">shu oy shartnomalari</div></div>
-    <div style="grid-column:span 2;display:flex;gap:8px">
-      <div style="flex:1;background:var(--greenbg);border-radius:12px;padding:10px;font-size:12px;color:#8FD9C3">Active <b style="color:var(--green2);font-size:16px">${N(M.active)}</b></div>
-      <div style="flex:1;background:var(--orangebg);border-radius:12px;padding:10px;font-size:12px;color:#F2C48A">Idle <b style="color:var(--orange);font-size:16px">${N(M.idle)}</b></div>
-      <div style="flex:1;background:var(--redbg);border-radius:12px;padding:10px;font-size:12px;color:#F0A9AE">Puli yo'q <b style="color:var(--red);font-size:16px">${N(M.puliYoq)}</b></div></div></section>`;
-  h += `<section class="card fade"><div class="between"><div class="ttl">Sotuvlarim o'sishi</div><div class="small muted">1–${M.kunlik.length}</div></div>
-    ${osish(M.kunlik)}
-    <div class="small soft" style="margin-top:10px">Eng uzun seriya: <b>${M.seriya} kun</b> ketma-ket · rejaga hissam: <b>${M.hissa}</b> ta</div></section>`;
+  if (!M) return sarlavha() + `<section class="card fade"><div class="ttl">Mening sotuvlarim</div><p class="small muted" style="margin:8px 0 0">Siz admin sifatida kirdingiz — shaxsiy sotuvlar yo'q. Botda xodim sifatida ro'yxatdan o'tsangiz, bu yerda o'z sotuvlaringiz chiqadi.</p></section>`;
+  const bosh = M.qisqa.split(" ").map((s) => s[0] || "").join("").slice(0, 2).toUpperCase(), T = M.tumanReja;
+  let h = sarlavha() + `<section class="card fade row" style="gap:12px">
+    <div style="width:50px;height:50px;border-radius:16px;background:var(--greenbg);color:var(--teal);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0">${esc(bosh)}</div>
+    <div style="flex:1" class="ellip"><div style="font-weight:800;font-size:18px" class="ellip">${esc(M.qisqa)}</div><div class="xs muted">${esc(M.tuman)} · ${esc(D.oy)}</div></div>
+    ${M.orin ? `<div style="text-align:center;background:#FEF3C7;border-radius:14px;padding:8px 12px"><div style="font-weight:800;font-size:20px;color:#B45309;line-height:1">${N(M.orin)}</div><div style="font-size:10px;color:#92400E;margin-top:2px">o'rin / ${M.operatorlar}</div></div>` : ""}</section>`;
+  h += `<section class="grid3 fade">
+    <div class="card kpi"><div class="lbl">Bugun</div><div class="num" style="margin-top:6px">${N(M.bugun)}</div><div class="xs muted">kecha ${M.kecha}</div></div>
+    <div class="card kpi"><div class="lbl">Shu oy</div><div class="num" style="margin-top:6px">${N(M.oy)}</div><div class="xs muted">sotuv</div></div>
+    <div class="card kpi"><div class="lbl">Seriya</div><div class="num" style="margin-top:6px">${N(M.seriya)}</div><div class="xs muted">kun ketma-ket</div></div></section>`;
+  h += `<section class="grid3 fade">
+    <div class="card kpi" style="background:var(--greenbg)"><div class="lbl" style="color:#047857">Active</div><div class="num" style="margin-top:6px;color:var(--green2)">${N(M.active)}</div></div>
+    <div class="card kpi" style="background:var(--orangebg)"><div class="lbl" style="color:#B45309">Idle</div><div class="num" style="margin-top:6px;color:var(--orange)">${N(M.idle)}</div></div>
+    <div class="card kpi" style="background:var(--redbg)"><div class="lbl" style="color:#B42318">Puli yo'q</div><div class="num" style="margin-top:6px;color:var(--red)">${N(M.puliYoq)}</div></div></section>`;
+  h += `<section class="card fade"><div class="ttl">Kunlik sotuvlarim</div>${grafik(M.kunlik, 0, "#3B82F6")}</section>`;
   if (T) {
     const men = Math.min(100, M.hissa * 100 / T.reja), boshqa = Math.max(0, Math.min(100, T.son * 100 / T.reja) - men);
     h += `<section class="card fade"><div class="ttl">${esc(M.tuman)} rejasi</div>
-      <div class="row" style="align-items:baseline;gap:8px;margin-top:10px"><span class="big">${N(T.son)}</span><span class="dim">/ ${T.reja}</span>
-        <span style="margin-left:auto;font-weight:700;color:var(--green2);font-size:18px">${N(T.foiz, "%")}</span></div>
-      <div class="track" style="height:14px;margin-top:10px"><div class="fill" style="background:var(--orange)" data-w="${men.toFixed(1)}"></div><div class="fill" style="background:var(--green)" data-w="${boshqa.toFixed(1)}"></div></div>
-      <div class="row small soft" style="gap:14px;margin-top:10px;flex-wrap:wrap">
-        <span><span class="dot" style="background:var(--orange)"></span>Mening hissam: <b>${M.hissa}</b> ta (${Math.round(M.hissa * 100 / T.reja)}%)</span>
-        <span><span class="dot" style="background:var(--green)"></span>Jamoa</span></div>
-      <div class="small muted" style="margin-top:8px">${T.qolgan > 0 ? `Rejagacha ${T.qolgan} ta qoldi${T.kuniga ? ` · kuniga ~${T.kuniga}` : ""}` : "Tuman rejasi bajarildi!"}</div></section>`;
+      <div class="row" style="align-items:baseline;gap:8px;margin-top:8px"><span class="num">${N(T.son)}</span><span class="muted">/ ${T.reja}</span><span style="margin-left:auto;font-weight:800;font-size:20px;color:var(--green2)">${N(T.foiz, "%")}</span></div>
+      <div class="track" style="height:14px;margin-top:10px"><div class="fill" style="background:var(--blue);border-radius:999px 0 0 999px" data-w="${men.toFixed(1)}"></div><div class="fill" style="background:var(--green);border-radius:0 999px 999px 0" data-w="${boshqa.toFixed(1)}"></div></div>
+      <div class="row small" style="gap:14px;margin-top:10px;flex-wrap:wrap"><span><span class="dot" style="background:var(--blue)"></span>Mening hissam: <b>${M.hissa}</b> ta (${pct(M.hissa, T.reja)}%)</span><span><span class="dot" style="background:var(--green)"></span>Jamoa</span></div>
+      <div class="small muted" style="margin-top:8px">${T.qolgan > 0 ? `Rejagacha ${T.qolgan} ta qoldi${T.kuniga ? ` · kuniga ~${T.kuniga}` : ""}` : "Tuman rejasi bajarildi! 🎉"}</div></section>`;
   }
-  h += `<section class="card fade"><div class="between"><div class="ttl">Idle abonentlarim</div><div class="small muted">${M.idlelar.length} ta</div></div>
-    ${M.idlelar.length ? M.idlelar.map((a) => `<div class="idle ${a.pulisiz ? "" : "bor"}">
-      <div class="between" style="font-size:13px"><b>${esc(a.login || "—")}</b>
-        ${a.pulisiz ? `<span class="tag" style="color:var(--red);background:var(--redbg)">puli yo'q</span>` : `<span class="tag" style="color:var(--orange);background:var(--orangebg)">puli bor</span>`}</div>
-      <div class="small soft">${esc(a.abonent || "")}${a.abonent && a.manzil ? " · " : ""}${esc(a.manzil || "")}</div>
-      <div class="xs dim">shartnoma: ${esc(a.sana)}${a.tarif ? " · " + esc(a.tarif) : ""}</div></div>`).join("")
-      : `<p class="small muted" style="margin:10px 0 0">Idle abonentingiz yo'q — barchasi ulangan 🎉</p>`}</section>`;
+  h += `<section class="card fade"><div class="between"><div class="ttl">Idle abonentlarim</div><span class="tag t-or">${M.idlelar.length} ta</span></div>
+    ${M.idlelar.length ? M.idlelar.map(abonentQator).join("") : `<p class="small muted" style="margin:10px 0 0">Idle abonentingiz yo'q — barchasi ulangan 🎉</p>`}</section>`;
+  return h;
+}
+function abonentQator(a) {
+  return `<div class="item"><div class="between"><b class="small">${esc(a.login || "—")}</b>
+    ${a.pulisiz ? `<span class="tag t-red">puli yo'q</span>` : `<span class="tag t-or">puli bor</span>`}</div>
+    <div class="small" style="color:var(--soft)">${esc(a.abonent || "")}${a.abonent && a.manzil ? " · " : ""}${esc(a.manzil || "")}</div>
+    <div class="xs muted">${a.op ? esc(a.op) + " · " + esc(a.tuman) + " · " : ""}shartnoma ${esc(a.sana)}${a.tarif ? " · " + esc(a.tarif) : ""}</div></div>`;
+}
+
+// ---------- Admin: Bugun
+function sahifaBugun() {
+  const A = D.adm, U = D.umumiy;
+  const farq = U.bugun - A.kechagi;
+  let h = sarlavha() + `<section class="card fade"><div class="lbl">Kunlik hisobot</div><div style="font-weight:800;font-size:22px;margin-top:4px">${esc(D.sana)}</div></section>`;
+  h += `<section class="grid3 fade">
+    <div class="card kpi"><div class="lbl">Sotuv</div><div class="num" style="margin-top:6px">${N(U.bugun)}</div><div class="xs" style="color:${farq >= 0 ? "var(--green2)" : "var(--red)"};font-weight:700">${farq >= 0 ? "▲" : "▼"} ${Math.abs(farq)} kechadan</div></div>
+    <div class="card kpi"><div class="lbl">Ulandi</div><div class="num" style="margin-top:6px;color:var(--green2)">${N(U.bugunUlangan)}</div><div class="xs muted">active</div></div>
+    <div class="card kpi"><div class="lbl">O'rtacha</div><div class="num" style="margin-top:6px;color:var(--blue)">${N(U.ortacha)}</div><div class="xs muted">kuniga</div></div></section>`;
+  const tm = Object.keys(A.tumanKunlik), maxT = Math.max(1, ...tm.map((t) => A.tumanKunlik[t][A.tumanKunlik[t].length - 1] || 0));
+  h += `<section class="card fade" style="display:flex;flex-direction:column;gap:12px"><div class="ttl">Tumanlar bo'yicha bugun</div>
+    ${tm.map((t) => { const k = A.tumanKunlik[t], b = k[k.length - 1] || 0, ke = k[k.length - 2] || 0, ul = A.ulangan.filter((x) => x.tuman === t).length;
+      return `<div><div class="between small"><b>${esc(t)}</b><span><b style="font-size:16px">${N(b)}</b> sotuv · <span style="color:var(--green2)">${ul} ulandi</span> <span class="xs muted">· kecha ${ke}</span></span></div>
+      <div class="track" style="margin-top:7px"><div class="fill" style="background:var(--green)" data-w="${(b * 100 / maxT).toFixed(1)}"></div></div></div>`; }).join("")}</section>`;
+  h += `<section class="card fade"><div class="between"><div class="ttl">Bugungi sotuvlar</div><span class="tag t-gr">${A.bugungi.length} ta</span></div>
+    ${A.bugungi.length ? A.bugungi.map((s) => `<div class="item"><div class="between"><b class="small ellip">${esc(s.op)}</b>${s.active ? '<span class="tag t-gr">active</span>' : '<span class="tag t-gy">idle</span>'}</div>
+      <div class="xs muted">${esc(s.tuman)} · ${esc(s.login || "—")}${s.tarif ? " · " + esc(s.tarif) : ""}</div></div>`).join("") : `<p class="small muted" style="margin:10px 0 0">Bugun hali sotuv kiritilmagan.</p>`}</section>`;
+  h += `<section class="card fade"><div class="between"><div class="ttl">Bugun ulanganlar</div><span class="tag t-gr">${A.ulangan.length} ta</span></div>
+    ${A.ulangan.length ? A.ulangan.map((s) => `<div class="item"><b class="small">${esc(s.login || "—")}</b><div class="xs muted">${esc(s.op)} · ${esc(s.tuman)}</div></div>`).join("") : `<p class="small muted" style="margin:10px 0 0">Bugun hali ulangan abonent yo'q.</p>`}</section>`;
   return h;
 }
 
-function chiz() {
-  const app = $("app");
-  app.innerHTML = TAB === "men" ? menSahifa(DATA) : umumiySahifa(DATA);
-  $("t-umumiy").classList.toggle("on", TAB === "umumiy");
-  $("t-men").classList.toggle("on", TAB === "men");
-  $("nav").classList.remove("hidden");
-  window.scrollTo(0, 0);
-  sanash(app);
+// ---------- Admin: Reja
+function sahifaReja() {
+  const R = D.reja, U = D.umumiy;
+  if (!R) return sarlavha() + rejaHero(null);
+  const ish = qolganIshKuni(), surat = U.ortacha || 0, prog = R.bajarildi + Math.round(surat * ish * (R.bajarildi / Math.max(1, U.jami)));
+  const progF = pct(prog, R.jami);
+  let h = sarlavha() + `<section class="card fade" style="text-align:center">
+    <div class="lbl">Oylik reja</div>
+    <div style="position:relative;width:180px;height:180px;margin:12px auto 6px">${halqa(R.foiz, 180, 16)}
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-weight:800;font-size:40px;line-height:1">${N(R.foiz, "%")}</div><div class="small muted" style="margin-top:4px">${fmt(R.bajarildi)} / ${fmt(R.jami)}</div></div></div>
+    <div class="grid3" style="margin-top:8px">
+      <div><div class="num" style="font-size:24px;color:var(--red)">${N(R.qolgan)}</div><div class="xs muted">qoldi</div></div>
+      <div><div class="num" style="font-size:24px">${N(ish)}</div><div class="xs muted">ish kuni qoldi</div></div>
+      <div><div class="num" style="font-size:24px;color:var(--blue)">${N(ish ? Math.ceil(R.qolgan / ish) : R.qolgan)}</div><div class="xs muted">kuniga kerak</div></div></div></section>`;
+  h += `<section class="card fade"><div class="ttl">Prognoz</div>
+    <p class="small" style="margin:8px 0 0;color:var(--soft)">Hozirgi sur'at (kuniga ~${surat} sotuv) saqlansa, oy oxirigacha taxminan <b>${fmt(prog)}</b> ta rejaga kiradi — <b style="color:${progF >= 100 ? "var(--green2)" : "var(--orange)"}">${progF}%</b>.</p>
+    <div class="track" style="height:12px;margin-top:10px;position:relative"><div class="fill" style="background:${progF >= 100 ? "var(--green)" : "var(--orange2)"}" data-w="${Math.min(100, progF)}"></div></div>
+    <div class="xs muted" style="margin-top:8px">Rejaga shu oy shartnomalari kiradi: active + 💰 puli bor idle (${R.puliBor} ta).${R.oldingiOy ? ` Oldingi oy shartnomalari (${R.oldingiOy} ta) kirmaydi.` : ""}${Object.keys(R.tashqari || {}).length ? " Rejadan tashqari tariflar: " + Object.entries(R.tashqari).map(([k, v]) => esc(k) + " " + v).join(", ") + "." : ""}</div></section>`;
+  h += R.tumanlar.map((t) => { const q = Math.max(0, t.reja - t.son), rang = t.foiz >= 80 ? "#10B981" : "#F59E0B";
+    return `<section class="card fade row" style="gap:14px">
+      <div style="position:relative;width:84px;height:84px;flex-shrink:0">${halqa(t.foiz, 84, 9, rang)}
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px">${N(t.foiz, "%")}</div></div>
+      <div style="flex:1;min-width:0"><div class="between"><b style="font-size:16px">${esc(t.nom)}</b><span class="small"><b>${fmt(t.son)}</b> / ${fmt(t.reja)}</span></div>
+        <div class="small" style="margin-top:6px;color:var(--soft)">${q ? `Qoldi <b style="color:var(--red)">${q}</b> · kuniga <b>${ish ? Math.ceil(q / ish) : q}</b> ta` : "<b style='color:var(--green2)'>Bajarildi! 🎉</b>"}</div>
+        <div class="xs muted" style="margin-top:3px">puli bor idle: ${t.puliBor}</div></div></section>`; }).join("");
+  return h;
 }
+
+// ---------- Admin: ro'yxatlar (qidiruv va filtrlar)
+function tumanChips(f, key) {
+  const tm = ["all", ...Object.keys(D.adm.tumanKunlik)];
+  return `<div class="chips">${tm.map((t) => `<button type="button" class="chip ${F[key].tuman === t ? "on" : ""}" onclick="F.${key}.tuman='${esc(t)}';F.${key}.n=40;chiz()">${t === "all" ? "Barcha tumanlar" : esc(t)}</button>`).join("")}</div>`;
+}
+function qidiruv(key, ph) {
+  return `<input class="search" type="search" placeholder="${ph}" value="${esc(F[key].q)}" oninput="F.${key}.q=this.value;F.${key}.n=40;royxatChiz('${key}')" aria-label="${ph}">`;
+}
+const mos = (q, ...s) => !q || s.join(" ").toLowerCase().includes(q.toLowerCase());
+
+function sahifaIdle() {
+  const L = D.adm.idlelar, py = L.filter((a) => a.pulisiz).length;
+  return sarlavha() + `<section class="grid3 fade">
+    <div class="card kpi"><div class="lbl">Idle</div><div class="num" style="margin-top:6px;color:var(--orange)">${N(L.length)}</div></div>
+    <div class="card kpi"><div class="lbl">Puli yo'q</div><div class="num" style="margin-top:6px;color:var(--red)">${N(py)}</div></div>
+    <div class="card kpi"><div class="lbl">Puli bor</div><div class="num" style="margin-top:6px;color:var(--green2)">${N(L.length - py)}</div></div></section>
+    <section class="card fade" style="display:flex;flex-direction:column;gap:10px">
+      <div class="chips">${[["all", "Hammasi"], ["yoq", "Puli yo'q"], ["bor", "Puli bor"]].map(([k, t]) => `<button type="button" class="chip ${F.idle.tur === k ? "on" : ""}" onclick="F.idle.tur='${k}';F.idle.n=40;chiz()">${t}</button>`).join("")}</div>
+      ${tumanChips(F.idle, "idle")}${qidiruv("idle", "Login, abonent, manzil yoki operator...")}
+      <div id="royxat-idle"></div></section>`;
+}
+function sahifaActive() {
+  const L = D.adm.activelar;
+  const tm = Object.keys(D.adm.tumanKunlik);
+  return sarlavha() + `<section class="grid${tm.length === 3 ? 3 : 2} fade">${tm.map((t) => `<div class="card kpi"><div class="lbl ellip">${esc(t)}</div><div class="num" style="margin-top:6px;color:var(--green2)">${N(L.filter((a) => a.tuman === t).length)}</div><div class="xs muted">active</div></div>`).join("")}</section>
+    <section class="card fade" style="display:flex;flex-direction:column;gap:10px">
+      <div class="between"><div class="ttl">Active abonentlar</div><span class="tag t-gr">${fmt(L.length)} ta</span></div>
+      ${tumanChips(F.active, "active")}${qidiruv("active", "Login, abonent yoki operator...")}
+      <div id="royxat-active"></div></section>`;
+}
+function sahifaReyting() {
+  return sarlavha() + `<section class="card fade" style="display:flex;flex-direction:column;gap:10px">
+    <div class="between"><div class="ttl">Sotuvchilar reytingi</div><span class="tag t-gy">${D.adm.reyting.length} ta</span></div>
+    ${tumanChips(F.reyt, "reyt")}${qidiruv("reyt", "Sotuvchi ismi...")}<div id="royxat-reyt"></div></section>`;
+}
+function royxatChiz(key) {
+  const box = $("royxat-" + key); if (!box) return;
+  const f = F[key]; let h = "";
+  if (key === "idle") {
+    const L = D.adm.idlelar.filter((a) => (f.tur === "all" || (f.tur === "yoq") === a.pulisiz) && (f.tuman === "all" || a.tuman === f.tuman) && mos(f.q, a.login, a.abonent, a.manzil, a.op));
+    h = `<div class="xs muted">${L.length} ta topildi</div>` + L.slice(0, f.n).map(abonentQator).join("") + (L.length > f.n ? `<button class="more" type="button" onclick="F.idle.n+=40;royxatChiz('idle')">Yana ko'rsatish (${L.length - f.n})</button>` : "");
+  } else if (key === "active") {
+    const L = D.adm.activelar.filter((a) => (f.tuman === "all" || a.tuman === f.tuman) && mos(f.q, a.login, a.abonent, a.op));
+    h = `<div class="xs muted">${L.length} ta topildi</div>` + L.slice(0, f.n).map((a) => `<div class="item"><div class="between"><b class="small">${esc(a.login || "—")}</b>${a.oldingi ? '<span class="tag t-bl">oldingi oy</span>' : ""}</div>
+      <div class="small" style="color:var(--soft)">${esc(a.abonent || "")}</div><div class="xs muted">${esc(a.op)} · ${esc(a.tuman)} · shartnoma ${esc(a.sana)}${a.ulangan ? " · ulangan " + esc(a.ulangan) : ""}</div></div>`).join("")
+      + (L.length > f.n ? `<button class="more" type="button" onclick="F.active.n+=40;royxatChiz('active')">Yana ko'rsatish (${L.length - f.n})</button>` : "");
+  } else {
+    const all = D.adm.reyting, L = all.filter((o) => (f.tuman === "all" || o.tuman === f.tuman) && mos(f.q, o.nom)), max = Math.max(1, ...all.map((o) => o.son));
+    h = L.map((o) => { const i = all.indexOf(o);
+      return `<div class="row" style="padding:10px 0;border-top:1px solid var(--line)">
+        <div class="medal" style="background:${(medal[i] || ["#F8FAFC"])[0]};color:${(medal[i] || ["", "#64748B"])[1]};width:32px;height:32px;font-size:13px">${i + 1}</div>
+        <div style="flex:1;min-width:0"><div class="row" style="gap:6px"><b class="small ellip">${esc(o.nom)}</b>${o.bugun ? `<span class="tag t-gr">+${o.bugun} bugun</span>` : ""}</div>
+          <div class="track" style="height:6px;margin-top:6px"><div class="fill" style="background:var(--green)" data-w="${(o.son * 100 / max).toFixed(1)}"></div></div>
+          <div class="xs muted" style="margin-top:5px">${esc(o.tuman)} · <span style="color:var(--green2)">active ${o.active}</span> · <span style="color:var(--orange)">idle ${o.idle}</span>${o.puliYoq ? ` · <span style="color:var(--red)">puli yo'q ${o.puliYoq}</span>` : ""}</div></div>
+        <div style="font-weight:800;font-size:19px;width:36px;text-align:right">${o.son}</div></div>`; }).join("") || `<p class="small muted">Topilmadi.</p>`;
+  }
+  box.innerHTML = h;
+  requestAnimationFrame(() => requestAnimationFrame(() => box.querySelectorAll("[data-w]").forEach((el) => (el.style.width = el.dataset.w + "%"))));
+}
+
+// ---------- Navigatsiya
+function tablar() {
+  const t = [["umumiy", "Umumiy"]];
+  if (D.admin && D.adm) t.push(["bugun", "Bugun"], ["reja", "Reja"], ["idle", "Idle"], ["active", "Active"], ["reyting", "Reyting"]);
+  t.push(["men", D.admin && D.adm ? "Men" : "Mening sotuvlarim"]);
+  return t;
+}
+function chiz() {
+  const sah = { umumiy: sahifaUmumiy, men: sahifaMen, bugun: sahifaBugun, reja: sahifaReja, idle: sahifaIdle, active: sahifaActive, reyting: sahifaReyting };
+  if (!tablar().some(([k]) => k === TAB)) TAB = "umumiy";
+  const app = $("app");
+  app.innerHTML = sah[TAB]();
+  ["idle", "active", "reyt"].forEach(royxatChiz);
+  $("navin").innerHTML = tablar().map(([k, t]) => `<button type="button" class="${TAB === k ? "on" : ""}" onclick="tabga('${k}')" aria-label="${t}">${icon(k)}<span>${t}</span></button>`).join("");
+  $("nav").classList.remove("hidden");
+  animatsiya(app);
+}
+function tabga(k) { TAB = k; window.scrollTo(0, 0); chiz(); if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged(); }
 
 function xato(matn) {
   $("nav").classList.add("hidden");
-  $("app").innerHTML = `<section class="card fade" style="margin-top:30vh;text-align:center">
+  $("app").innerHTML = `<section class="card fade" style="margin-top:28vh;text-align:center">
     <div class="ttl" style="margin-bottom:8px">7-bog'lama sotuv</div><div class="small muted">${esc(matn)}</div>
-    ${tg && tg.initData ? `<button class="iconbtn" style="width:auto;padding:0 16px;margin:14px auto 0" type="button" onclick="yukla(true)">Qayta urinish</button>` : ""}</section>`;
+    ${tg && tg.initData ? `<button class="chip on" style="margin-top:14px" type="button" onclick="yukla(true)">Qayta urinish</button>` : ""}</section>`;
 }
-
 async function yukla(qayta) {
-  if (qayta && DATA) { $("app").style.opacity = ".5"; }
+  if (qayta && D) $("app").style.opacity = ".5";
   const demo = new URLSearchParams(location.search).has("demo");
   if (!demo && !(tg && tg.initData)) return xato("Ilovani Telegram'dagi botning «📱 Ilova» tugmasi orqali oching.");
   try {
-    const res = demo ? DEMO : await (await fetch(API, { method: "POST", body: JSON.stringify({ action: "app", initData: tg.initData }) })).json();
+    const res = demo ? demoMalumot() : await (await fetch(API, { method: "POST", body: JSON.stringify({ action: "app", initData: tg.initData }) })).json();
     if (!res.ok) return xato(res.error || "Ma'lumotni olib bo'lmadi.");
-    DATA = res;
-    if (!res.men) TAB = "umumiy";
-    $("app").style.opacity = "1";
-    chiz();
+    D = res; $("app").style.opacity = "1"; chiz();
     if (tg && tg.HapticFeedback && qayta) tg.HapticFeedback.notificationOccurred("success");
-  } catch (e) {
-    xato("Internet yoki server bilan aloqa yo'q. Birozdan so'ng qayta urinib ko'ring.");
-  }
+  } catch (e) { xato("Internet yoki server bilan aloqa yo'q. Birozdan so'ng qayta urinib ko'ring."); }
 }
 
-$("t-umumiy").onclick = () => { TAB = "umumiy"; chiz(); };
-$("t-men").onclick = () => { TAB = "men"; chiz(); };
-
-// ?demo — brauzerda ko'rish uchun o'ylab topilgan namunaviy raqamlar (haqiqiy ma'lumot emas)
-const DEMO = { ok: true, oy: "Noyabr 2026", sana: "27.11.2026", sbms: "26.11.2026 20:28",
-  umumiy: { jami: 400, oldingiActive: 12, active: 330, idle: 82, puliYoq: 40, bugun: 12, kecha: 21, bugunUlangan: 9, rekord: { son: 28, kun: 25 }, ortacha: 18,
-    kunlik: [0, 9, 18, 15, 14, 20, 8, 0, 17, 16, 17, 20, 15, 8, 3, 21, 17, 20, 20, 24, 13, 0, 25, 24, 28, 21, 12] },
-  tumanlar: [{ nom: "Tuman A", jami: 200, active: 165, idle: 35 }, { nom: "Tuman B", jami: 70, active: 62, idle: 8 }, { nom: "Tuman C", jami: 142, active: 103, idle: 39 }],
-  reja: { jami: 450, bajarildi: 352, puliBor: 30, foiz: 78, qolgan: 98, qolganKun: 3, kuniga: 33, oldingiOy: 12, tashqari: {},
-    tumanlar: [{ nom: "Tuman A", reja: 210, son: 178, puliBor: 13, foiz: 85 }, { nom: "Tuman B", reja: 70, son: 62, puliBor: 0, foiz: 89 }, { nom: "Tuman C", reja: 170, son: 112, puliBor: 17, foiz: 66 }] },
-  top: [{ nom: "Operator 1", tuman: "Tuman A", son: 19 }, { nom: "Operator 2", tuman: "Tuman A", son: 18 }, { nom: "Operator 3", tuman: "Tuman C", son: 17 }, { nom: "Operator 4", tuman: "Tuman B", son: 16 }, { nom: "Operator 5", tuman: "Tuman A", son: 15 }],
-  men: { ism: "Namuna Xodim", qisqa: "Namuna Xodim", tuman: "Tuman A", orin: 2, operatorlar: 60, oy: 18, active: 15, idle: 3, puliYoq: 1, bugun: 1, kecha: 1, seriya: 6, hissa: 16,
-    kunlik: [0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1],
-    tumanReja: { reja: 210, son: 178, foiz: 85, qolgan: 32, kuniga: 11 },
-    idlelar: [{ login: "m0000001", abonent: "Namuna Abonent", manzil: "Namuna ko'chasi 1", tarif: "Tarif", sana: "24.11.2026", pulisiz: true },
-              { login: "m0000002", abonent: "Namuna Abonent 2", manzil: "Namuna ko'chasi 2", tarif: "Tarif", sana: "25.11.2026", pulisiz: false }] } };
+// ?demo — brauzerda ko'rish uchun o'ylab topilgan namunaviy ma'lumot (haqiqiy emas)
+function demoMalumot() {
+  const k = [0, 9, 18, 15, 14, 20, 8, 0, 17, 16, 17, 20, 15, 8, 3, 21, 17, 20, 20, 24, 13, 0, 25, 24, 28, 21, 12];
+  const tm = ["Tuman A", "Tuman B", "Tuman C"], ism = (i) => "Operator " + (i + 1);
+  const idl = Array.from({ length: 30 }, (_, i) => ({ login: "m00000" + (10 + i), abonent: "Namuna Abonent " + (i + 1), manzil: "Namuna ko'chasi " + (i + 1), op: ism(i % 12), tuman: tm[i % 3], sana: (1 + i % 26) + ".11.2026", tarif: "Tarif", pulisiz: i % 3 === 0 }));
+  const act = Array.from({ length: 60 }, (_, i) => ({ login: "m00001" + (10 + i), abonent: "Namuna Abonent " + (i + 31), op: ism(i % 12), tuman: tm[i % 3], sana: (1 + i % 26) + ".11.2026", ulangan: (2 + i % 25) + ".11.2026", oldingi: i % 15 === 0 }));
+  return { ok: true, admin: true, oy: "Noyabr 2026", sana: "27.11.2026", sbms: "27.11.2026 08:40",
+    umumiy: { jami: 400, oldingiActive: 12, active: 330, idle: 82, puliYoq: 40, bugun: 12, kecha: 21, bugunUlangan: 9, rekord: { son: 28, kun: 25 }, ortacha: 18, kunlik: k },
+    tumanlar: [{ nom: tm[0], jami: 190, active: 160, idle: 35 }, { nom: tm[1], jami: 70, active: 62, idle: 8 }, { nom: tm[2], jami: 140, active: 108, idle: 39 }],
+    reja: { jami: 450, bajarildi: 352, puliBor: 30, foiz: 78, qolgan: 98, qolganKun: 3, kuniga: 33, oldingiOy: 12, tashqari: {},
+      tumanlar: [{ nom: tm[0], reja: 210, son: 178, puliBor: 13, foiz: 85 }, { nom: tm[1], reja: 70, son: 62, puliBor: 0, foiz: 89 }, { nom: tm[2], reja: 170, son: 112, puliBor: 17, foiz: 66 }] },
+    top: [0, 1, 2, 3, 4].map((i) => ({ nom: ism(i), tuman: tm[i % 3], son: 19 - i })),
+    men: { ism: "Namuna Xodim", qisqa: "Namuna Xodim", tuman: tm[0], orin: 2, operatorlar: 60, oy: 18, active: 15, idle: 3, puliYoq: 1, bugun: 1, kecha: 1, seriya: 6, hissa: 16,
+      kunlik: k.map((v) => (v > 10 ? 1 : 0)), tumanReja: { reja: 210, son: 178, foiz: 85, qolgan: 32, kuniga: 11 }, idlelar: idl.slice(0, 2) },
+    adm: { bugungi: Array.from({ length: 12 }, (_, i) => ({ op: ism(i), tuman: tm[i % 3], login: "m00002" + (10 + i), tarif: "Tarif", active: i % 4 === 0 })), kechagi: 21,
+      ulangan: Array.from({ length: 9 }, (_, i) => ({ op: ism(i + 2), tuman: tm[i % 3], login: "m00003" + (10 + i) })),
+      tumanKunlik: { [tm[0]]: k.map((v) => Math.round(v * .5)), [tm[1]]: k.map((v) => Math.round(v * .2)), [tm[2]]: k.map((v) => Math.round(v * .3)) },
+      idlelar: idl, activelar: act, reyting: Array.from({ length: 15 }, (_, i) => ({ nom: ism(i), tuman: tm[i % 3], son: 19 - i, active: 17 - i, idle: 2, puliYoq: i % 2, bugun: i % 3 === 0 ? 1 : 0 })) } };
+}
 
 yukla();
 </script>

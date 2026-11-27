@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>7-bog'lama sotuv</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B1220;--card:#131C2E;--line:#1F2B42;--track:#22304A;--text:#E8EDF5;--muted:#9AA7BA;--dim:#6B7A92;--soft:#C9D3E1;
+  --green:#2EC4A0;--green2:#5BE0B9;--greenbg:#10261F;--greenline:#1C4236;--orange:#F5B35C;--orangebg:#2A1E10;--orangeline:#4A3518;
+  --red:#F27A84;--redbg:#2E1518}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:480px;margin:0 auto;padding:16px 16px 96px;display:flex;flex-direction:column;gap:14px}
+.h{font-family:'Space Grotesk',sans-serif}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px}
+.ttl{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px}
+.row{display:flex;align-items:center;gap:12px}
+.between{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.muted{color:var(--muted)}.dim{color:var(--dim)}.soft{color:var(--soft)}
+.small{font-size:12px}.xs{font-size:11px}
+.big{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:28px;line-height:1.1}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.kpi{border-radius:18px;padding:14px;border:1px solid var(--line);background:var(--card)}
+.kpi.g{background:var(--greenbg);border-color:var(--greenline)}.kpi.o{background:var(--orangebg);border-color:var(--orangeline)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.bars{height:130px;display:flex;align-items:flex-end;gap:3px;margin-top:16px;border-bottom:1px solid var(--track)}
+.bar{flex:1;height:0;border-radius:4px 4px 0 0;transition:height .9s cubic-bezier(.2,.8,.2,1)}
+.track{height:10px;background:var(--track);border-radius:999px;overflow:hidden;display:flex}
+.fill{height:100%;width:0;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.top{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.medal{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.ellip{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{font-size:11px;color:var(--muted);background:#151F31;border:1px solid #22304A;border-radius:999px;padding:6px 10px;white-space:nowrap}
+nav{position:fixed;left:0;right:0;bottom:0;padding:8px 16px calc(8px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 30%)}
+nav .in{max-width:480px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:6px}
+nav button{min-height:44px;border:0;border-radius:13px;background:transparent;color:var(--soft);font:600 14px Inter,sans-serif;cursor:pointer}
+nav button.on{background:var(--green);color:#062019}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--soft);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.sk{background:linear-gradient(90deg,#131C2E,#1A2539,#131C2E);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:22px}
+@keyframes sk{to{background-position:-200% 0}}
+.fade{animation:fade .5s ease both}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.idle{background:#1A1422;border:1px solid #3A2430;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.idle.bor{background:#1E1A10;border-color:#4A3518}
+.tag{font-size:11px;border-radius:999px;padding:2px 8px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="sk" style="height:56px"></div><div class="sk" style="height:164px"></div>
+  <div class="sk" style="height:200px"></div><div class="sk" style="height:250px"></div>
+</div>
+<nav id="nav" class="hidden"><div class="in">
+  <button id="t-umumiy" class="on" type="button">Umumiy</button>
+  <button id="t-men" type="button">Mening sotuvlarim</button>
+</div></nav>
+
+<script>
+// Ma'lumot manbai: Google Apps Script (u Telegram imzosini tekshiradi va Google Sheets'dan hisoblaydi)
+const API = "https://script.google.com/macros/s/AKfycbzZouOEdxytwjybbTNZDqMRXqASeA1jmtw_NJQq2V0eAQvNSRJZMUls3JIpBD6WrAgd/exec";
+const tg = window.Telegram && window.Telegram.WebApp;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let DATA = null, TAB = "umumiy";
+
+if (tg) { tg.ready(); tg.expand(); try { tg.setHeaderColor("#0B1220"); tg.setBackgroundColor("#0B1220"); } catch (e) {} }
+
+// ---------- Animatsiyalar
+function sanash(root) {
+  root.querySelectorAll("[data-n]").forEach((el) => {
+    const n = Number(el.dataset.n), s = performance.now(), d = 1300, suf = el.dataset.suf || "";
+    const step = (t) => {
+      const k = Math.min(1, (t - s) / d), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(n * e).toLocaleString("ru-RU") + suf;
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    root.querySelectorAll("[data-h]").forEach((el) => (el.style.height = el.dataset.h + "px"));
+    root.querySelectorAll("[data-w]").forEach((el) => (el.style.width = el.dataset.w + "%"));
+    root.querySelectorAll("[data-dash]").forEach((el) => (el.style.strokeDashoffset = el.dataset.dash));
+  }));
+}
+const N = (v, suf = "") => `<span data-n="${Number(v) || 0}" data-suf="${suf}">0${suf}</span>`;
+const medal = [["#3A2F0E", "#F5C542"], ["#2A2F38", "#D6DCE5"], ["#33220F", "#E0A066"]];
+
+function halqa(foiz) {
+  const C = 2 * Math.PI * 52, off = C * (1 - Math.min(100, foiz) / 100);
+  return `<svg width="128" height="128" viewBox="0 0 128 128" aria-hidden="true">
+    <circle cx="64" cy="64" r="52" fill="none" stroke="#22304A" stroke-width="12"/>
+    <circle cx="64" cy="64" r="52" fill="none" stroke="#2EC4A0" stroke-width="12" stroke-linecap="round"
+      stroke-dasharray="${C.toFixed(1)}" style="stroke-dashoffset:${C.toFixed(1)};transition:stroke-dashoffset 1.3s cubic-bezier(.2,.8,.2,1)"
+      data-dash="${off.toFixed(1)}" transform="rotate(-90 64 64)"/></svg>`;
+}
+
+function ustunlar(kunlik) {
+  const max = Math.max(1, ...kunlik);
+  const rek = kunlik.indexOf(Math.max(...kunlik));
+  return `<div class="bars">${kunlik.map((v, i) =>
+    `<div class="bar" title="${i + 1}-kun: ${v}" style="background:${v === 0 ? "#22304A" : (i === rek ? "#F5B35C" : "#2EC4A0")}" data-h="${v ? Math.max(4, v / max * 120) : 2}"></div>`).join("")}</div>
+    <div class="between xs dim" style="margin-top:6px"><span>1</span><span>${Math.ceil(kunlik.length / 2)}</span><span>${kunlik.length}</span></div>`;
+}
+
+function osish(kunlik) {
+  const W = 320, H = 150, n = kunlik.length; let jam = 0;
+  const jami = Math.max(1, kunlik.reduce((a, b) => a + b, 0));
+  const pts = kunlik.map((v, i) => { jam += v; return [n > 1 ? i * W / (n - 1) : 0, 140 - jam / jami * 120]; });
+  const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+  const last = pts[pts.length - 1] || [0, 140];
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Sotuvlarim o'sish grafigi" style="display:block;margin-top:14px;overflow:visible">
+    <line x1="0" y1="140" x2="${W}" y2="140" stroke="#22304A"/><line x1="0" y1="80" x2="${W}" y2="80" stroke="#1A2539" stroke-dasharray="3 4"/>
+    <path d="${d} L${last[0].toFixed(1)} 140 L0 140 Z" fill="#2EC4A0" fill-opacity=".14"/>
+    <path d="${d}" fill="none" stroke="#2EC4A0" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"
+      stroke-dasharray="1200" style="stroke-dashoffset:1200;transition:stroke-dashoffset 1.6s ease" data-dash="0"/>
+    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="5" fill="#0B1220" stroke="#5BE0B9" stroke-width="3"/></svg>`;
+}
+
+// ---------- Sahifalar
+function sarlavha(D) {
+  return `<header class="row fade" style="justify-content:space-between">
+    <div class="row" style="gap:10px">
+      <div class="h" style="width:40px;height:40px;border-radius:12px;background:var(--green);color:#062019;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px">7</div>
+      <div style="min-width:0"><div class="h" style="font-weight:700;font-size:17px;white-space:nowrap">7-bog'lama sotuv</div>
+      <div class="small muted" style="white-space:nowrap">${esc(D.oy)} · ${esc(D.sana.slice(0, 5))}</div></div>
+    </div>
+    <div class="row" style="gap:8px">${D.sbms ? `<span class="chip" title="SBMS bilan oxirgi sinxronizatsiya">SBMS ${esc(D.sbms.slice(0, 5))}</span>` : ""}
+      <button class="iconbtn" type="button" onclick="yukla(true)" aria-label="Yangilash">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path d="M21 3v5h-5"/></svg>
+      </button></div></header>`;
+}
+
+function rejaKarta(R) {
+  if (!R) return `<section class="card fade small muted">Bu oy uchun reja hali kiritilmagan.</section>`;
+  const qolgan = R.qolgan > 0
+    ? `Qolgan <b>${N(R.qolgan)}</b> ta${R.qolganKun > 0 ? ` · ${R.qolganKun} kun · kuniga ~${R.kuniga}` : ""}`
+    : `<b style="color:var(--green2)">Reja bajarildi!</b>`;
+  return `<section class="card fade row" style="gap:16px">
+    <div style="position:relative;width:128px;height:128px;flex-shrink:0">${halqa(R.foiz)}
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div class="h" style="font-weight:700;font-size:30px;line-height:1">${N(R.foiz, "%")}</div><div class="xs muted" style="margin-top:4px">bajarildi</div></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+      <div class="small muted" style="text-transform:uppercase;letter-spacing:.06em">Oylik reja</div>
+      <div class="big" style="font-size:26px">${N(R.bajarildi)} <span class="dim" style="font-size:18px">/ ${R.jami}</span></div>
+      <div class="small" style="color:var(--orange)"><span class="dot" style="background:var(--orange)"></span>puli bor idle: ${N(R.puliBor)}</div>
+      <div class="small soft">${qolgan}</div></div></section>`;
+}
+
+function umumiySahifa(D) {
+  const U = D.umumiy, R = D.reja;
+  const tumanlar = R && R.tumanlar.length ? R.tumanlar : null;
+  let h = sarlavha(D) + rejaKarta(R);
+  h += `<section class="grid2 fade">
+    <div class="kpi"><div class="small muted">Jami sotuv</div><div class="big" style="margin-top:6px">${N(U.jami)}</div><div class="xs dim">deaktivlarsiz</div></div>
+    <div class="kpi g"><div class="small" style="color:#8FD9C3">Active</div><div class="big" style="margin-top:6px;color:var(--green2)">${N(U.active)}</div><div class="xs" style="color:#8FD9C3">${N(U.jami ? Math.round(U.active * 100 / U.jami) : 0, "%")} ulangan</div></div>
+    <div class="kpi o"><div class="small" style="color:#F2C48A">Idle</div><div class="big" style="margin-top:6px;color:var(--orange)">${N(U.idle)}</div><div class="xs" style="color:#F2C48A">puli yo'q: ${N(U.puliYoq)}</div></div>
+    <div class="kpi"><div class="small muted">Bugun</div><div class="big" style="margin-top:6px">${N(U.bugun)}</div><div class="xs dim">kecha: ${U.kecha} · ulandi: ${U.bugunUlangan}</div></div></section>`;
+  h += `<section class="card fade"><div class="between"><div class="ttl">Kunlik sotuvlar</div>
+    ${U.rekord.son ? `<div class="small muted">rekord: ${U.rekord.son} · ${U.rekord.kun}-kun</div>` : ""}</div>
+    ${ustunlar(U.kunlik)}
+    <div class="row small soft" style="gap:16px;margin-top:12px"><span>O'rtacha: <b>${U.ortacha}</b>/ish kuni</span></div></section>`;
+  if (tumanlar) {
+    h += `<section class="card fade" style="display:flex;flex-direction:column;gap:14px"><div class="ttl">Tumanlar bo'yicha reja</div>
+      ${tumanlar.map((t) => `<div><div class="between" style="font-size:13px"><b>${esc(t.nom)}</b>
+        <span class="soft">${N(t.son)} / ${t.reja} · <b style="color:var(--green2)">${N(t.foiz, "%")}</b></span></div>
+        <div class="track" style="margin-top:8px"><div class="fill" style="background:var(--green)" data-w="${Math.min(100, t.son * 100 / t.reja).toFixed(1)}"></div></div>
+        <div class="xs" style="color:#F2C48A;margin-top:6px"><span class="dot" style="background:var(--orange)"></span>puli bor idle: ${t.puliBor}</div></div>`).join("")}
+      ${R.oldingiOy ? `<div class="xs dim">Oldingi oy shartnomalari (rejaga kirmaydi): ${R.oldingiOy} ta</div>` : ""}
+      ${Object.keys(R.tashqari || {}).length ? `<div class="xs dim">Rejadan tashqari tariflar: ${Object.entries(R.tashqari).map(([k, v]) => esc(k) + " " + v).join(" · ")}</div>` : ""}
+    </section>`;
+  } else {
+    h += `<section class="card fade" style="display:flex;flex-direction:column;gap:12px"><div class="ttl">Tumanlar</div>
+      ${D.tumanlar.map((t) => `<div class="between small"><b>${esc(t.nom)}</b><span class="soft">${t.jami} ta · <span style="color:var(--green2)">${t.active} active</span> · <span style="color:var(--orange)">${t.idle} idle</span></span></div>`).join("")}</section>`;
+  }
+  h += `<section class="card fade"><div class="ttl" style="margin-bottom:10px">TOP 5 sotuvchi</div>
+    ${D.top.map((o, i) => `<div class="top"><div class="medal" style="background:${(medal[i] || ["#1C2638"])[0]};color:${(medal[i] || ["", "#C9D3E1"])[1]}">${i + 1}</div>
+      <div style="flex:1;min-width:0"><div class="ellip" style="font-size:14px;font-weight:600">${esc(o.nom)}</div><div class="xs muted">${esc(o.tuman)}</div></div>
+      <div class="h" style="font-weight:700;font-size:18px">${N(o.son)}</div></div>`).join("")}</section>`;
+  return h;
+}
+
+function menSahifa(D) {
+  const M = D.men;
+  if (!M) return sarlavha(D) + `<section class="card fade"><div class="ttl">Mening sotuvlarim</div>
+    <p class="small muted" style="margin:10px 0 0">Siz admin sifatida kirdingiz — shaxsiy sotuvlar yo'q. Botda xodim sifatida ro'yxatdan o'tsangiz, bu yerda o'z sotuvlaringiz chiqadi.</p></section>`;
+  const bosh = M.qisqa.split(" ").map((s) => s[0] || "").join("").slice(0, 2).toUpperCase();
+  const T = M.tumanReja;
+  let h = `<header class="row fade">
+    <div class="h" style="width:48px;height:48px;border-radius:16px;background:#1C3A33;color:var(--green2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px">${esc(bosh)}</div>
+    <div style="flex:1;min-width:0"><div class="h ellip" style="font-weight:700;font-size:18px">${esc(M.qisqa)}</div>
+      <div class="small muted">${esc(M.tuman)} · ${esc(D.oy)}</div></div>
+    ${M.orin ? `<div style="text-align:center;background:#3A2F0E;border-radius:14px;padding:8px 12px">
+      <div class="h" style="font-weight:700;font-size:18px;color:#F5C542;line-height:1">${N(M.orin)}</div>
+      <div style="font-size:10px;color:#F2D98A;margin-top:2px">-o'rin / ${M.operatorlar}</div></div>` : ""}</header>`;
+  h += `<section class="card fade grid2" style="gap:12px">
+    <div><div class="small muted">Bugun</div><div class="big" style="font-size:34px">${N(M.bugun)}</div><div class="xs dim">kecha: ${M.kecha} ta</div></div>
+    <div><div class="small muted">Shu oy</div><div class="big" style="font-size:34px">${N(M.oy)}</div><div class="xs dim">sotuv (deaktivlarsiz)</div></div>
+    <div style="grid-column:span 2;display:flex;gap:8px">
+      <div style="flex:1;background:var(--greenbg);border-radius:12px;padding:10px;font-size:12px;color:#8FD9C3">Active <b style="color:var(--green2);font-size:16px">${N(M.active)}</b></div>
+      <div style="flex:1;background:var(--orangebg);border-radius:12px;padding:10px;font-size:12px;color:#F2C48A">Idle <b style="color:var(--orange);font-size:16px">${N(M.idle)}</b></div>
+      <div style="flex:1;background:var(--redbg);border-radius:12px;padding:10px;font-size:12px;color:#F0A9AE">Puli yo'q <b style="color:var(--red);font-size:16px">${N(M.puliYoq)}</b></div></div></section>`;
+  h += `<section class="card fade"><div class="between"><div class="ttl">Sotuvlarim o'sishi</div><div class="small muted">1–${M.kunlik.length}</div></div>
+    ${osish(M.kunlik)}
+    <div class="small soft" style="margin-top:10px">Eng uzun seriya: <b>${M.seriya} kun</b> ketma-ket · rejaga hissam: <b>${M.hissa}</b> ta</div></section>`;
+  if (T) {
+    const men = Math.min(100, M.hissa * 100 / T.reja), boshqa = Math.max(0, Math.min(100, T.son * 100 / T.reja) - men);
+    h += `<section class="card fade"><div class="ttl">${esc(M.tuman)} rejasi</div>
+      <div class="row" style="align-items:baseline;gap:8px;margin-top:10px"><span class="big">${N(T.son)}</span><span class="dim">/ ${T.reja}</span>
+        <span style="margin-left:auto;font-weight:700;color:var(--green2);font-size:18px">${N(T.foiz, "%")}</span></div>
+      <div class="track" style="height:14px;margin-top:10px"><div class="fill" style="background:var(--orange)" data-w="${men.toFixed(1)}"></div><div class="fill" style="background:var(--green)" data-w="${boshqa.toFixed(1)}"></div></div>
+      <div class="row small soft" style="gap:14px;margin-top:10px;flex-wrap:wrap">
+        <span><span class="dot" style="background:var(--orange)"></span>Mening hissam: <b>${M.hissa}</b> ta (${Math.round(M.hissa * 100 / T.reja)}%)</span>
+        <span><span class="dot" style="background:var(--green)"></span>Jamoa</span></div>
+      <div class="small muted" style="margin-top:8px">${T.qolgan > 0 ? `Rejagacha ${T.qolgan} ta qoldi${T.kuniga ? ` · kuniga ~${T.kuniga}` : ""}` : "Tuman rejasi bajarildi!"}</div></section>`;
+  }
+  h += `<section class="card fade"><div class="between"><div class="ttl">Idle abonentlarim</div><div class="small muted">${M.idlelar.length} ta</div></div>
+    ${M.idlelar.length ? M.idlelar.map((a) => `<div class="idle ${a.pulisiz ? "" : "bor"}">
+      <div class="between" style="font-size:13px"><b>${esc(a.login || "—")}</b>
+        ${a.pulisiz ? `<span class="tag" style="color:var(--red);background:var(--redbg)">puli yo'q</span>` : `<span class="tag" style="color:var(--orange);background:var(--orangebg)">puli bor</span>`}</div>
+      <div class="small soft">${esc(a.abonent || "")}${a.abonent && a.manzil ? " · " : ""}${esc(a.manzil || "")}</div>
+      <div class="xs dim">shartnoma: ${esc(a.sana)}${a.tarif ? " · " + esc(a.tarif) : ""}</div></div>`).join("")
+      : `<p class="small muted" style="margin:10px 0 0">Idle abonentingiz yo'q — barchasi ulangan 🎉</p>`}</section>`;
+  return h;
+}
+
+function chiz() {
+  const app = $("app");
+  app.innerHTML = TAB === "men" ? menSahifa(DATA) : umumiySahifa(DATA);
+  $("t-umumiy").classList.toggle("on", TAB === "umumiy");
+  $("t-men").classList.toggle("on", TAB === "men");
+  $("nav").classList.remove("hidden");
+  window.scrollTo(0, 0);
+  sanash(app);
+}
+
+function xato(matn) {
+  $("nav").classList.add("hidden");
+  $("app").innerHTML = `<section class="card fade" style="margin-top:30vh;text-align:center">
+    <div class="ttl" style="margin-bottom:8px">7-bog'lama sotuv</div><div class="small muted">${esc(matn)}</div>
+    ${tg && tg.initData ? `<button class="iconbtn" style="width:auto;padding:0 16px;margin:14px auto 0" type="button" onclick="yukla(true)">Qayta urinish</button>` : ""}</section>`;
+}
+
+async function yukla(qayta) {
+  if (qayta && DATA) { $("app").style.opacity = ".5"; }
+  const demo = new URLSearchParams(location.search).has("demo");
+  if (!demo && !(tg && tg.initData)) return xato("Ilovani Telegram'dagi botning «📱 Ilova» tugmasi orqali oching.");
+  try {
+    const res = demo ? DEMO : await (await fetch(API, { method: "POST", body: JSON.stringify({ action: "app", initData: tg.initData }) })).json();
+    if (!res.ok) return xato(res.error || "Ma'lumotni olib bo'lmadi.");
+    DATA = res;
+    if (!res.men) TAB = "umumiy";
+    $("app").style.opacity = "1";
+    chiz();
+    if (tg && tg.HapticFeedback && qayta) tg.HapticFeedback.notificationOccurred("success");
+  } catch (e) {
+    xato("Internet yoki server bilan aloqa yo'q. Birozdan so'ng qayta urinib ko'ring.");
+  }
+}
+
+$("t-umumiy").onclick = () => { TAB = "umumiy"; chiz(); };
+$("t-men").onclick = () => { TAB = "men"; chiz(); };
+
+// ?demo — brauzerda ko'rish uchun o'ylab topilgan namunaviy raqamlar (haqiqiy ma'lumot emas)
+const DEMO = { ok: true, oy: "Noyabr 2026", sana: "27.11.2026", sbms: "26.11.2026 20:28",
+  umumiy: { jami: 412, active: 330, idle: 82, puliYoq: 40, bugun: 12, kecha: 21, bugunUlangan: 9, rekord: { son: 28, kun: 25 }, ortacha: 18,
+    kunlik: [0, 9, 18, 15, 14, 20, 8, 0, 17, 16, 17, 20, 15, 8, 3, 21, 17, 20, 20, 24, 13, 0, 25, 24, 28, 21, 12] },
+  tumanlar: [{ nom: "Tuman A", jami: 200, active: 165, idle: 35 }, { nom: "Tuman B", jami: 70, active: 62, idle: 8 }, { nom: "Tuman C", jami: 142, active: 103, idle: 39 }],
+  reja: { jami: 450, bajarildi: 352, puliBor: 30, foiz: 78, qolgan: 98, qolganKun: 3, kuniga: 33, oldingiOy: 12, tashqari: {},
+    tumanlar: [{ nom: "Tuman A", reja: 210, son: 178, puliBor: 13, foiz: 85 }, { nom: "Tuman B", reja: 70, son: 62, puliBor: 0, foiz: 89 }, { nom: "Tuman C", reja: 170, son: 112, puliBor: 17, foiz: 66 }] },
+  top: [{ nom: "Operator 1", tuman: "Tuman A", son: 19 }, { nom: "Operator 2", tuman: "Tuman A", son: 18 }, { nom: "Operator 3", tuman: "Tuman C", son: 17 }, { nom: "Operator 4", tuman: "Tuman B", son: 16 }, { nom: "Operator 5", tuman: "Tuman A", son: 15 }],
+  men: { ism: "Namuna Xodim", qisqa: "Namuna Xodim", tuman: "Tuman A", orin: 2, operatorlar: 60, oy: 18, active: 15, idle: 3, puliYoq: 1, bugun: 1, kecha: 1, seriya: 6, hissa: 16,
+    kunlik: [0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1],
+    tumanReja: { reja: 210, son: 178, foiz: 85, qolgan: 32, kuniga: 11 },
+    idlelar: [{ login: "m0000001", abonent: "Namuna Abonent", manzil: "Namuna ko'chasi 1", tarif: "Tarif", sana: "24.11.2026", pulisiz: true },
+              { login: "m0000002", abonent: "Namuna Abonent 2", manzil: "Namuna ko'chasi 2", tarif: "Tarif", sana: "25.11.2026", pulisiz: false }] } };
+
+yukla();
+</script>
+</body>
+</html>

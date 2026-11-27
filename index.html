@@ -60,7 +60,12 @@ nav button.on{background:var(--green);color:#062019}
 
 <script>
 // Ma'lumot manbai: Google Apps Script (u Telegram imzosini tekshiradi va Google Sheets'dan hisoblaydi)
-const API = "https://script.google.com/macros/s/AKfycbzZouOEdxytwjybbTNZDqMRXqASeA1jmtw_NJQq2V0eAQvNSRJZMUls3JIpBD6WrAgd/exec";
+// Manzilni bot o'zi beradi (?api=...), shuning uchun Apps Script yangi manzilga ko'chsa sahifani qayta yuklash shart emas
+const API = (() => {
+  const a = new URLSearchParams(location.search).get("api") || "";
+  return a.startsWith("https://script.google.com/macros/s/") ? a
+    : "https://script.google.com/macros/s/AKfycbwzYvqVeXlT8yr7LS5olddyPID1VxpMOBnCCNQYV5ewXdUc8lO2KWO35JTY0_zz-cUe/exec";
+})();
 const tg = window.Telegram && window.Telegram.WebApp;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

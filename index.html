@@ -159,8 +159,8 @@ function umumiySahifa(D) {
   const tumanlar = R && R.tumanlar.length ? R.tumanlar : null;
   let h = sarlavha(D) + rejaKarta(R);
   h += `<section class="grid2 fade">
-    <div class="kpi"><div class="small muted">Jami sotuv</div><div class="big" style="margin-top:6px">${N(U.jami)}</div><div class="xs dim">deaktivlarsiz</div></div>
-    <div class="kpi g"><div class="small" style="color:#8FD9C3">Active</div><div class="big" style="margin-top:6px;color:var(--green2)">${N(U.active)}</div><div class="xs" style="color:#8FD9C3">${N(U.jami ? Math.round(U.active * 100 / U.jami) : 0, "%")} ulangan</div></div>
+    <div class="kpi"><div class="small muted">Jami sotuv</div><div class="big" style="margin-top:6px">${N(U.jami)}</div><div class="xs dim">shu oy shartnomalari</div></div>
+    <div class="kpi g"><div class="small" style="color:#8FD9C3">Active</div><div class="big" style="margin-top:6px;color:var(--green2)">${N(U.active)}</div><div class="xs" style="color:#8FD9C3">${U.oldingiActive ? `shundan oldingi oy: ${U.oldingiActive}` : "ulangan abonentlar"}</div></div>
     <div class="kpi o"><div class="small" style="color:#F2C48A">Idle</div><div class="big" style="margin-top:6px;color:var(--orange)">${N(U.idle)}</div><div class="xs" style="color:#F2C48A">puli yo'q: ${N(U.puliYoq)}</div></div>
     <div class="kpi"><div class="small muted">Bugun</div><div class="big" style="margin-top:6px">${N(U.bugun)}</div><div class="xs dim">kecha: ${U.kecha} · ulandi: ${U.bugunUlangan}</div></div></section>`;
   h += `<section class="card fade"><div class="between"><div class="ttl">Kunlik sotuvlar</div>
@@ -202,7 +202,7 @@ function menSahifa(D) {
       <div style="font-size:10px;color:#F2D98A;margin-top:2px">-o'rin / ${M.operatorlar}</div></div>` : ""}</header>`;
   h += `<section class="card fade grid2" style="gap:12px">
     <div><div class="small muted">Bugun</div><div class="big" style="font-size:34px">${N(M.bugun)}</div><div class="xs dim">kecha: ${M.kecha} ta</div></div>
-    <div><div class="small muted">Shu oy</div><div class="big" style="font-size:34px">${N(M.oy)}</div><div class="xs dim">sotuv (deaktivlarsiz)</div></div>
+    <div><div class="small muted">Shu oy</div><div class="big" style="font-size:34px">${N(M.oy)}</div><div class="xs dim">shu oy shartnomalari</div></div>
     <div style="grid-column:span 2;display:flex;gap:8px">
       <div style="flex:1;background:var(--greenbg);border-radius:12px;padding:10px;font-size:12px;color:#8FD9C3">Active <b style="color:var(--green2);font-size:16px">${N(M.active)}</b></div>
       <div style="flex:1;background:var(--orangebg);border-radius:12px;padding:10px;font-size:12px;color:#F2C48A">Idle <b style="color:var(--orange);font-size:16px">${N(M.idle)}</b></div>
@@ -270,7 +270,7 @@ $("t-men").onclick = () => { TAB = "men"; chiz(); };
 
 // ?demo — brauzerda ko'rish uchun o'ylab topilgan namunaviy raqamlar (haqiqiy ma'lumot emas)
 const DEMO = { ok: true, oy: "Noyabr 2026", sana: "27.11.2026", sbms: "26.11.2026 20:28",
-  umumiy: { jami: 412, active: 330, idle: 82, puliYoq: 40, bugun: 12, kecha: 21, bugunUlangan: 9, rekord: { son: 28, kun: 25 }, ortacha: 18,
+  umumiy: { jami: 400, oldingiActive: 12, active: 330, idle: 82, puliYoq: 40, bugun: 12, kecha: 21, bugunUlangan: 9, rekord: { son: 28, kun: 25 }, ortacha: 18,
     kunlik: [0, 9, 18, 15, 14, 20, 8, 0, 17, 16, 17, 20, 15, 8, 3, 21, 17, 20, 20, 24, 13, 0, 25, 24, 28, 21, 12] },
   tumanlar: [{ nom: "Tuman A", jami: 200, active: 165, idle: 35 }, { nom: "Tuman B", jami: 70, active: 62, idle: 8 }, { nom: "Tuman C", jami: 142, active: 103, idle: 39 }],
   reja: { jami: 450, bajarildi: 352, puliBor: 30, foiz: 78, qolgan: 98, qolganKun: 3, kuniga: 33, oldingiOy: 12, tashqari: {},

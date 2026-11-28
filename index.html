@@ -278,11 +278,11 @@ function sahifaBugun() {
   return h;
 }
 
-// ---------- Prognoz: yangi sotuvlar (rejaga kiradigan ulushi bilan) + puli yo'qlarning 60–70% to'lovi
+// ---------- Prognoz: yangi sotuvlar (rejaga kiradigan ulushi bilan) + puli yo'qlarning 70–80% to'lovi
 function prognoz(R, U) {
   const ish = R.ishKunlari ?? qolganIshKuni(), surat = R.surat ?? U.ortacha ?? 0, pY = R.puliYoq || 0;
   const asos = R.bajarildi + Math.round(surat * ish * R.bajarildi / Math.max(1, U.jami));
-  return { ish, surat, puliYoq: pY, asos, past: asos + Math.round(pY * 0.6), yuqori: asos + Math.round(pY * 0.7) };
+  return { ish, surat, puliYoq: pY, asos, past: asos + Math.round(pY * 0.7), yuqori: asos + Math.round(pY * 0.8) };
 }
 
 // ---------- Admin: Reja
@@ -303,7 +303,7 @@ function sahifaReja() {
     <div class="grid2" style="margin-top:10px">
       <div style="background:#F6F8FB;border-radius:14px;padding:12px"><div class="xs muted">Hozirgi sur'atda</div>
         <div class="num" style="font-size:24px;margin-top:4px">${fmt(P.asos)}</div><div class="xs" style="font-weight:700;color:${progF >= 100 ? "var(--green2)" : "var(--orange)"}">${progF}% reja</div></div>
-      <div style="background:var(--greenbg);border-radius:14px;padding:12px"><div class="xs" style="color:#047857">+ puli yo'qlar 60–70% to'lasa</div>
+      <div style="background:var(--greenbg);border-radius:14px;padding:12px"><div class="xs" style="color:#047857">+ puli yo'qlar 70–80% to'lasa</div>
         <div class="num" style="font-size:24px;margin-top:4px;color:var(--green2)">${fmt(P.past)}–${fmt(P.yuqori)}</div><div class="xs" style="font-weight:700;color:#047857">${pct(P.past, R.jami)}–${pct(P.yuqori, R.jami)}% reja</div></div></div>
     <div style="position:relative;height:14px;background:var(--track);border-radius:999px;margin-top:12px;overflow:hidden">
       <div class="fill" style="position:absolute;left:0;top:0;height:14px;background:var(--green)" data-w="${Math.min(100, pct(R.bajarildi, R.jami))}"></div>
@@ -311,7 +311,7 @@ function sahifaReja() {
       <div style="position:absolute;top:0;height:14px;left:${Math.min(100, progF)}%;width:${Math.max(0, Math.min(100, pct(P.yuqori, R.jami)) - Math.min(100, progF))}%;background:repeating-linear-gradient(45deg,#6EE7B7 0 4px,#D1FAE5 4px 8px)"></div>
       <div style="position:absolute;top:-2px;bottom:-2px;left:calc(100% - 2px);width:2px;background:#0F172A"></div></div>
     <div class="row xs muted" style="flex-wrap:wrap;gap:12px;margin-top:8px"><span><span class="dot" style="background:var(--green)"></span>bajarildi</span><span><span class="dot" style="background:#A7F3D0"></span>yangi sotuvlar</span><span><span class="dot" style="background:#6EE7B7"></span>puli yo'qlar to'lovi (${P.puliYoq} ta)</span></div>
-    <p class="small" style="margin:10px 0 0;color:var(--soft)">Oxirgi ish kunlaridagi sur'at: kuniga ~${P.surat} sotuv, ${P.ish} ish kuni qoldi. Oy oxirida xodimlar puli yo'q abonentlardan to'lov yig'adi — odatda 60–70% to'laydi.</p>
+    <p class="small" style="margin:10px 0 0;color:var(--soft)">Oxirgi ish kunlaridagi sur'at: kuniga ~${P.surat} sotuv, ${P.ish} ish kuni qoldi. Oy oxirida xodimlar puli yo'q abonentlardan to'lov yig'adi — odatda 70–80% to'laydi.</p>
     <div class="xs muted" style="margin-top:8px">Rejaga shu oy shartnomalari kiradi: active + 💰 puli bor idle (${R.puliBor} ta).${R.oldingiOy ? ` Oldingi oy shartnomalari (${R.oldingiOy} ta) kirmaydi.` : ""}${Object.keys(R.tashqari || {}).length ? " Rejadan tashqari tariflar: " + Object.entries(R.tashqari).map(([k, v]) => esc(k) + " " + v).join(", ") + "." : ""}</div></section>`;
   h += R.tumanlar.map((t) => { const q = Math.max(0, t.reja - t.son), rang = t.foiz >= 80 ? "#10B981" : "#F59E0B";
     return `<section class="card fade row" style="gap:14px">

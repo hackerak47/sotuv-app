@@ -182,6 +182,7 @@ function rejaHero(R) {
       <div class="lbl" style="color:#A7F3D0">Oylik reja</div>
       <div style="font-weight:800;font-size:26px;line-height:1">${N(R.bajarildi)} <span style="font-size:16px;color:#99F6E4">/ ${fmt(R.jami)}</span></div>
       <div class="xs" style="color:#FDE68A"><span class="dot" style="background:#FCD34D"></span>puli bor idle: ${R.puliBor}</div>
+      ${Object.keys(R.tashqari || {}).length ? `<div class="xs" style="color:#99F6E4">rejadan tashqari tarif: ${Object.entries(R.tashqari).map(([k, v]) => esc(k) + " " + v).join(", ")}</div>` : ""}
       <div class="small" style="color:#CCFBF1">${R.qolgan > 0 ? `Qolgan <b style="color:#fff">${fmt(R.qolgan)}</b> · ${R.qolganKun} kun · kuniga ~${R.kuniga}` : "<b>Reja bajarildi! 🎉</b>"}</div></div></section>`;
 }
 function kpi(lbl, v, sub, rang = "") { return `<div class="card kpi"><div class="lbl">${lbl}</div><div class="num" style="margin-top:6px;${rang ? "color:" + rang : ""}">${N(v)}</div><div class="xs muted" style="margin-top:4px">${sub}</div></div>`; }

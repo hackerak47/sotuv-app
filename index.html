@@ -315,9 +315,10 @@ function qidiruv(key, ph) {
 const mos = (q, ...s) => !q || s.join(" ").toLowerCase().includes(q.toLowerCase());
 
 function sahifaIdle() {
-  const L = D.adm.idlelar, py = L.filter((a) => a.pulisiz).length;
+  // tepadagi raqamlar tanlangan tuman bo'yicha
+  const L = D.adm.idlelar.filter((a) => F.idle.tuman === "all" || a.tuman === F.idle.tuman), py = L.filter((a) => a.pulisiz).length;
   return sarlavha() + `<section class="grid3 fade">
-    <div class="card kpi"><div class="lbl">Idle</div><div class="num" style="margin-top:6px;color:var(--orange)">${N(L.length)}</div></div>
+    <div class="card kpi"><div class="lbl ellip">Idle${F.idle.tuman === "all" ? "" : " · " + esc(F.idle.tuman)}</div><div class="num" style="margin-top:6px;color:var(--orange)">${N(L.length)}</div></div>
     <div class="card kpi"><div class="lbl">Puli yo'q</div><div class="num" style="margin-top:6px;color:var(--red)">${N(py)}</div></div>
     <div class="card kpi"><div class="lbl">Puli bor</div><div class="num" style="margin-top:6px;color:var(--green2)">${N(L.length - py)}</div></div></section>
     <section class="card fade" style="display:flex;flex-direction:column;gap:10px">
@@ -328,7 +329,7 @@ function sahifaIdle() {
 function sahifaActive() {
   const L = D.adm.activelar;
   const tm = Object.keys(D.adm.tumanKunlik);
-  return sarlavha() + `<section class="grid${tm.length === 3 ? 3 : 2} fade">${tm.map((t) => `<div class="card kpi"><div class="lbl ellip">${esc(t)}</div><div class="num" style="margin-top:6px;color:var(--green2)">${N(L.filter((a) => a.tuman === t).length)}</div><div class="xs muted">active</div></div>`).join("")}</section>
+  return sarlavha() + `<section class="grid${tm.length === 3 ? 3 : 2} fade">${tm.map((t) => `<div class="card kpi" style="${F.active.tuman === t ? "outline:2px solid var(--green);" : F.active.tuman !== "all" ? "opacity:.55;" : ""}"><div class="lbl ellip">${esc(t)}</div><div class="num" style="margin-top:6px;color:var(--green2)">${N(L.filter((a) => a.tuman === t).length)}</div><div class="xs muted">active</div></div>`).join("")}</section>
     <section class="card fade" style="display:flex;flex-direction:column;gap:10px">
       <div class="between"><div class="ttl">Active abonentlar</div><span class="tag t-gr">${fmt(L.length)} ta</span></div>
       ${tumanChips(F.active, "active")}${qidiruv("active", "Login, abonent yoki operator...")}

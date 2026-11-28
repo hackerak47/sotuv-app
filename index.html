@@ -278,12 +278,18 @@ function sahifaBugun() {
   return h;
 }
 
+// ---------- Prognoz: yangi sotuvlar (rejaga kiradigan ulushi bilan) + puli yo'qlarning 60–70% to'lovi
+function prognoz(R, U) {
+  const ish = R.ishKunlari ?? qolganIshKuni(), surat = R.surat ?? U.ortacha ?? 0, pY = R.puliYoq || 0;
+  const asos = R.bajarildi + Math.round(surat * ish * R.bajarildi / Math.max(1, U.jami));
+  return { ish, surat, puliYoq: pY, asos, past: asos + Math.round(pY * 0.6), yuqori: asos + Math.round(pY * 0.7) };
+}
+
 // ---------- Admin: Reja
 function sahifaReja() {
   const R = D.reja, U = D.umumiy;
   if (!R) return sarlavha() + rejaHero(null);
-  const ish = qolganIshKuni(), surat = U.ortacha || 0, prog = R.bajarildi + Math.round(surat * ish * (R.bajarildi / Math.max(1, U.jami)));
-  const progF = pct(prog, R.jami);
+  const P = prognoz(R, U), ish = P.ish, progF = pct(P.asos, R.jami);
   let h = sarlavha() + `<section class="card fade" style="text-align:center">
     <div class="lbl">Oylik reja</div>
     <div style="position:relative;width:180px;height:180px;margin:12px auto 6px">${halqa(R.foiz, 180, 16)}
@@ -293,9 +299,19 @@ function sahifaReja() {
       <div><div class="num" style="font-size:24px;color:var(--red)">${N(R.qolgan)}</div><div class="xs muted">qoldi</div></div>
       <div><div class="num" style="font-size:24px">${N(ish)}</div><div class="xs muted">ish kuni qoldi</div></div>
       <div><div class="num" style="font-size:24px;color:var(--blue)">${N(ish ? Math.ceil(R.qolgan / ish) : R.qolgan)}</div><div class="xs muted">kuniga kerak</div></div></div></section>`;
-  h += `<section class="card fade"><div class="ttl">Prognoz</div>
-    <p class="small" style="margin:8px 0 0;color:var(--soft)">Hozirgi sur'at (kuniga ~${surat} sotuv) saqlansa, oy oxirigacha taxminan <b>${fmt(prog)}</b> ta rejaga kiradi — <b style="color:${progF >= 100 ? "var(--green2)" : "var(--orange)"}">${progF}%</b>.</p>
-    <div class="track" style="height:12px;margin-top:10px;position:relative"><div class="fill" style="background:${progF >= 100 ? "var(--green)" : "var(--orange2)"}" data-w="${Math.min(100, progF)}"></div></div>
+  h += `<section class="card fade"><div class="ttl">Prognoz — oy oxiriga</div>
+    <div class="grid2" style="margin-top:10px">
+      <div style="background:#F6F8FB;border-radius:14px;padding:12px"><div class="xs muted">Hozirgi sur'atda</div>
+        <div class="num" style="font-size:24px;margin-top:4px">${fmt(P.asos)}</div><div class="xs" style="font-weight:700;color:${progF >= 100 ? "var(--green2)" : "var(--orange)"}">${progF}% reja</div></div>
+      <div style="background:var(--greenbg);border-radius:14px;padding:12px"><div class="xs" style="color:#047857">+ puli yo'qlar 60–70% to'lasa</div>
+        <div class="num" style="font-size:24px;margin-top:4px;color:var(--green2)">${fmt(P.past)}–${fmt(P.yuqori)}</div><div class="xs" style="font-weight:700;color:#047857">${pct(P.past, R.jami)}–${pct(P.yuqori, R.jami)}% reja</div></div></div>
+    <div style="position:relative;height:14px;background:var(--track);border-radius:999px;margin-top:12px;overflow:hidden">
+      <div class="fill" style="position:absolute;left:0;top:0;height:14px;background:var(--green)" data-w="${Math.min(100, pct(R.bajarildi, R.jami))}"></div>
+      <div style="position:absolute;top:0;height:14px;left:${Math.min(100, pct(R.bajarildi, R.jami))}%;width:${Math.max(0, Math.min(100, progF) - Math.min(100, pct(R.bajarildi, R.jami)))}%;background:#A7F3D0"></div>
+      <div style="position:absolute;top:0;height:14px;left:${Math.min(100, progF)}%;width:${Math.max(0, Math.min(100, pct(P.yuqori, R.jami)) - Math.min(100, progF))}%;background:repeating-linear-gradient(45deg,#6EE7B7 0 4px,#D1FAE5 4px 8px)"></div>
+      <div style="position:absolute;top:-2px;bottom:-2px;left:calc(100% - 2px);width:2px;background:#0F172A"></div></div>
+    <div class="row xs muted" style="flex-wrap:wrap;gap:12px;margin-top:8px"><span><span class="dot" style="background:var(--green)"></span>bajarildi</span><span><span class="dot" style="background:#A7F3D0"></span>yangi sotuvlar</span><span><span class="dot" style="background:#6EE7B7"></span>puli yo'qlar to'lovi (${P.puliYoq} ta)</span></div>
+    <p class="small" style="margin:10px 0 0;color:var(--soft)">Oxirgi ish kunlaridagi sur'at: kuniga ~${P.surat} sotuv, ${P.ish} ish kuni qoldi. Oy oxirida xodimlar puli yo'q abonentlardan to'lov yig'adi — odatda 60–70% to'laydi.</p>
     <div class="xs muted" style="margin-top:8px">Rejaga shu oy shartnomalari kiradi: active + 💰 puli bor idle (${R.puliBor} ta).${R.oldingiOy ? ` Oldingi oy shartnomalari (${R.oldingiOy} ta) kirmaydi.` : ""}${Object.keys(R.tashqari || {}).length ? " Rejadan tashqari tariflar: " + Object.entries(R.tashqari).map(([k, v]) => esc(k) + " " + v).join(", ") + "." : ""}</div></section>`;
   h += R.tumanlar.map((t) => { const q = Math.max(0, t.reja - t.son), rang = t.foiz >= 80 ? "#10B981" : "#F59E0B";
     return `<section class="card fade row" style="gap:14px">
@@ -414,7 +430,7 @@ function demoMalumot() {
   return { ok: true, admin: true, oy: "Noyabr 2026", sana: "27.11.2026", sbms: "27.11.2026 08:40",
     umumiy: { jami: 400, oldingiActive: 12, active: 330, idle: 82, puliYoq: 40, bugun: 12, kecha: 21, bugunUlangan: 9, rekord: { son: 28, kun: 25 }, ortacha: 18, kunlik: k },
     tumanlar: [{ nom: tm[0], jami: 190, active: 160, idle: 35 }, { nom: tm[1], jami: 70, active: 62, idle: 8 }, { nom: tm[2], jami: 140, active: 108, idle: 39 }],
-    reja: { jami: 450, bajarildi: 352, puliBor: 30, foiz: 78, qolgan: 98, qolganKun: 3, kuniga: 33, oldingiOy: 12, tashqari: {},
+    reja: { jami: 450, bajarildi: 352, puliBor: 30, foiz: 78, qolgan: 98, qolganKun: 3, kuniga: 33, oldingiOy: 12, tashqari: {}, puliYoq: 38, ishKunlari: 2, surat: 21.4,
       tumanlar: [{ nom: tm[0], reja: 210, son: 178, puliBor: 13, foiz: 85 }, { nom: tm[1], reja: 70, son: 62, puliBor: 0, foiz: 89 }, { nom: tm[2], reja: 170, son: 112, puliBor: 17, foiz: 66 }] },
     top: [0, 1, 2, 3, 4].map((i) => ({ nom: ism(i), tuman: tm[i % 3], son: 19 - i })),
     men: { ism: "Namuna Xodim", qisqa: "Namuna Xodim", tuman: tm[0], orin: 2, operatorlar: 60, oy: 18, active: 15, idle: 3, puliYoq: 1, bugun: 1, kecha: 1, seriya: 6, hissa: 16,

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>7-bog'lama sotuv — TV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#E6EBF2;overflow:hidden;font-family:Inter,sans-serif;color:#0F172A;cursor:none}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;background:#EEF2F7;transform-origin:0 0;padding:26px 36px;display:flex;flex-direction:column;gap:18px}
+.card{background:#fff;border-radius:24px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06)}
+.lbl{font-size:16px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#64748B}
+.kpi{padding:20px 24px;display:flex;flex-direction:column;justify-content:space-between}
+.num{font-weight:800;font-size:54px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.sub{font-size:17px;color:#64748B}
+th{font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B;text-align:right;padding:0 14px 10px}
+td{font-size:21px;text-align:right;padding:11px 14px;border-top:1px solid #EEF1F6;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left;padding-left:0}
+.bar{height:12px;background:#EEF1F6;border-radius:999px;overflow:hidden}.bar>div{height:100%;border-radius:999px;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.grow{transform:scaleY(0);transform-origin:bottom;transform-box:fill-box;transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+#toast{position:absolute;left:50%;top:26px;transform:translate(-50%,-220%);opacity:0;transition:transform .6s cubic-bezier(.2,.9,.3,1.2),opacity .4s;background:#10B981;color:#fff;border-radius:22px;padding:16px 30px;display:flex;align-items:center;gap:16px;box-shadow:0 14px 40px rgba(16,185,129,.4);z-index:5}
+#toast.on{transform:translate(-50%,0);opacity:1}
+.tick{display:flex;gap:34px;white-space:nowrap;animation:tick 40s linear infinite}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;color:#475569;text-align:center;padding:80px}
+</style>
+</head>
+<body>
+<div id="stage"><div class="msg">Yuklanmoqda...</div></div>
+
+<script>
+// Ofis TV dashboardi. Ma'lumot: Google Apps Script ("tv" amali), maxfiy kalit havolada (?kalit=...).
+const Q = new URLSearchParams(location.search);
+const API = (() => { const a = Q.get("api") || ""; return a.startsWith("https://script.google.com/macros/s/") ? a
+  : "https://script.google.com/macros/s/AKfycbwzYvqVeXlT8yr7LS5olddyPID1VxpMOBnCCNQYV5ewXdUc8lO2KWO35JTY0_zz-cUe/exec"; })();
+const KALIT = Q.get("kalit") || "", DEMO = Q.has("demo");
+const $ = (id) => document.getElementById(id), stage = $("stage");
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = (n) => Number(n || 0).toLocaleString("ru-RU"), pct = (a, b) => (b ? Math.round(a * 100 / b) : 0);
+let D = null, ESKI = {}, aloqa = true, oxirgiVaqt = "";
+
+// 1920x1080 sahna har qanday ekranga moslashadi
+function moslash() { const k = Math.min(innerWidth / 1920, innerHeight / 1080);
+  stage.style.transform = `scale(${k})`; stage.style.left = (innerWidth - 1920 * k) / 2 + "px"; stage.style.top = (innerHeight - 1080 * k) / 2 + "px"; }
+addEventListener("resize", moslash); moslash();
+
+const HK = ["Ya", "Du", "Se", "Ch", "Pa", "Ju", "Sh"], OYLAR = ["yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avgust", "sentyabr", "oktyabr", "noyabr", "dekabr"];
+const sq = () => { const [k, o, y] = D.sana.split(".").map(Number); return { k, o, y }; };
+const hk = (d) => { const { o, y } = sq(); return new Date(y, o - 1, d).getDay(); };
+const N = (key, v) => `<span data-k="${key}" data-n="${Number(v) || 0}">${fmt(ESKI[key] ?? 0)}</span>`;
+
+function grafik(k, ortacha) {
+  const W = 1300, H = 300, L = 44, T = 30, B = 64, ph = H - T - B, ymax = Math.max(10, Math.ceil(Math.max(...k) * 1.12));
+  const slot = (W - L - 10) / k.length, bw = slot * 0.62, y = (v) => T + ph - (v / ymax) * ph, rek = Math.max(...k);
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><defs><pattern id="chiz" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="#D1FAE5"/><rect width="4" height="10" fill="#10B981"/></pattern></defs>`;
+  const step = ymax > 40 ? 20 : 10;
+  for (let g = 0; g <= ymax; g += step) s += `<line x1="${L}" x2="${W - 6}" y1="${y(g)}" y2="${y(g)}" stroke="#E6EAF2" stroke-width="1.5"/><text x="${L - 12}" y="${y(g) + 6}" text-anchor="end" font-size="16" fill="#94A0B4">${g}</text>`;
+  k.forEach((v, i) => { if (hk(i + 1) === 0) s += `<rect x="${L + i * slot}" y="${T}" width="${slot}" height="${ph}" fill="#F3F5F9"/>`; });
+  k.forEach((v, i) => {
+    const d = i + 1, x = L + i * slot + (slot - bw) / 2, cx = L + i * slot + slot / 2, bugun = d === k.length, yak = hk(d) === 0, isRek = v === rek && v > 0;
+    if (v) {
+      s += `<rect class="grow" x="${x}" y="${y(v)}" width="${bw}" height="${T + ph - y(v)}" rx="6" fill="${bugun ? "url(#chiz)" : isRek ? "#F59E0B" : "#10B981"}"${bugun ? ' stroke="#10B981" stroke-width="2"' : ""}/>`;
+      s += `<text x="${cx}" y="${y(v) - 8}" text-anchor="middle" font-size="16" font-weight="700" fill="${isRek ? "#B45309" : "#1E293B"}">${v}</text>`;
+    } else s += `<text x="${cx}" y="${T + ph - 8}" text-anchor="middle" font-size="14" fill="#B4BDCC">–</text>`;
+    s += `<text x="${cx}" y="${T + ph + 22}" text-anchor="middle" font-size="16" font-weight="${bugun ? 800 : 600}" fill="${bugun ? "#0F766E" : "#334155"}">${d}</text>`;
+    s += `<text x="${cx}" y="${T + ph + 42}" text-anchor="middle" font-size="13" fill="${yak ? "#E5484D" : "#94A0B4"}">${HK[hk(d)]}</text>`;
+  });
+  if (ortacha) s += `<line x1="${L}" x2="${W - 6}" y1="${y(ortacha)}" y2="${y(ortacha)}" stroke="#3B82F6" stroke-width="2.5" stroke-dasharray="8 6"/>`;
+  return s + "</svg>";
+}
+function haftalar(k) {
+  const h = []; let j = null;
+  k.forEach((v, i) => { const d = i + 1; if (!j || hk(d) === 1) { j = { b: d, o: d, s: 0 }; h.push(j); } j.o = d; j.s += v; });
+  if (h.length > 1 && h[0].o === h[0].b) { h[1].b = h[0].b; h[1].s += h[0].s; h.shift(); }
+  const eng = Math.max(...h.map((x) => x.s)), oy = OYLAR[sq().o - 1];
+  return h.map((x, i) => { const so = i === h.length - 1, e = x.s === eng && !so;
+    return `<div style="background:${e ? "#FEF3C7" : so ? "#ECFDF5" : "#F6F8FB"};border-radius:14px;padding:10px 16px;font-size:17px;color:${e ? "#92400E" : so ? "#047857" : "#475569"}">${x.b}–${x.o} ${oy}: <b style="font-size:22px;color:#0F172A">${x.s}</b> ta${e ? " · eng yaxshi" : so ? " · hozircha" : ""}</div>`; }).join("");
+}
+function prognoz(R, U) {
+  const ish = R.ishKunlari ?? 0, surat = R.surat ?? U.ortacha ?? 0, pY = R.puliYoq || 0;
+  const asos = R.bajarildi + Math.round(surat * ish * R.bajarildi / Math.max(1, U.jami));
+  return { asos, past: asos + Math.round(pY * .6), yuqori: asos + Math.round(pY * .7), pY, ish };
+}
+
+function chiz() {
+  const U = D.umumiy, R = D.reja, k = U.kunlik;
+  const s7 = k.slice(Math.max(0, k.length - 8), k.length - 1).reduce((a, b) => a + b, 0), o7 = k.slice(Math.max(0, k.length - 15), Math.max(0, k.length - 8)).reduce((a, b) => a + b, 0);
+  const f7 = o7 ? Math.round((s7 - o7) * 100 / o7) : 0, P = R ? prognoz(R, U) : null;
+  const tm = (R && R.tumanlar.length ? R.tumanlar : D.tumanlar.map((t) => ({ nom: t.nom })));
+  const maxTop = Math.max(1, ...D.top.map((o) => o.son));
+  const med = [["#FEF3C7", "#B45309"], ["#F1F5F9", "#475569"], ["#FFEDD5", "#C2410C"]];
+  stage.innerHTML = `
+  <div id="toast"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    <div><div style="font-weight:800;font-size:26px;line-height:1.1" id="toast-t"></div><div style="font-size:16px;font-weight:600;opacity:.9" id="toast-s"></div></div></div>
+  <header style="height:70px;display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:18px">
+      <img src="belgi.png" alt="" style="width:64px;height:64px;border-radius:18px;box-shadow:0 6px 16px rgba(0,71,155,.25)">
+      <div><div style="font-weight:800;font-size:36px;line-height:1.05">7-bog'lama sotuv</div>
+      <div style="font-size:19px;color:#64748B;margin-top:4px">${esc(D.oy)} · ${tm.map((t) => esc(t.nom)).join(", ")}</div></div>
+      <img src="uztelecom.png" alt="Uztelecom" style="height:30px;margin-left:26px;opacity:.95">
+    </div>
+    <div style="display:flex;align-items:center;gap:18px">
+      <div style="font-size:17px;font-weight:600;border-radius:999px;padding:10px 18px;${aloqa ? "color:#047857;background:#D1FAE5" : "color:#B42318;background:#FEF0F0"}"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${aloqa ? "#10B981" : "#E5484D"};margin-right:8px"></span>${aloqa ? `Jonli · ${esc(D.vaqt || "")} da yangilandi` : "Aloqa yo'q — oxirgi ma'lumot"}</div>
+      ${D.sbms ? `<div style="font-size:17px;color:#475569;background:#fff;border-radius:999px;padding:10px 18px;font-weight:600">SBMS: ${esc(D.sbms.slice(0, 5))}</div>` : ""}
+      <div style="text-align:right"><div style="font-weight:800;font-size:52px;line-height:1" id="soat">--:--</div><div style="font-size:17px;color:#64748B" id="sana"></div></div>
+    </div>
+  </header>
+  <section style="height:138px;display:grid;grid-template-columns:1.25fr repeat(5,minmax(0,1fr));gap:18px">
+    <div class="card kpi" style="background:linear-gradient(135deg,#0F766E,#0B5E58);color:#fff">
+      <div class="lbl" style="color:#A7F3D0">Oylik reja</div>
+      ${R ? `<div style="display:flex;align-items:baseline;gap:14px"><span class="num">${N("rf", R.foiz)}%</span><span style="font-size:22px;color:#CCFBF1">${fmt(R.bajarildi)} / ${fmt(R.jami)}</span></div>
+      <div class="bar" style="height:10px;background:rgba(255,255,255,.2)"><div style="width:0;background:#5EEAD4" data-w="${Math.min(100, R.foiz)}"></div></div>` : `<div style="font-size:20px">Reja kiritilmagan</div><div></div>`}
+    </div>
+    <div class="card kpi"><div class="lbl">Bugun sotuv</div><div class="num">${N("bs", U.bugun)}</div><div class="sub">kecha: ${U.kecha}</div></div>
+    <div class="card kpi"><div class="lbl">Bugun ulandi</div><div class="num" style="color:#059669">${N("bu", U.bugunUlangan)}</div><div class="sub">active bo'ldi</div></div>
+    <div class="card kpi"><div class="lbl">Oxirgi 7 kun</div><div class="num">${N("s7", s7)}</div><div class="sub">${o7 ? `<b style="color:${f7 >= 0 ? "#059669" : "#E5484D"}">${f7 >= 0 ? "▲" : "▼"} ${Math.abs(f7)}%</b> oldingi 7 kundan` : "sotuv"}</div></div>
+    <div class="card kpi"><div class="lbl">Oy bo'yicha sotuv</div><div class="num">${N("oj", U.jami)}</div><div class="sub">active: <b style="color:#059669">${fmt(U.active)}</b></div></div>
+    <div class="card kpi"><div class="lbl">Idle</div><div class="num" style="color:#D97706">${N("id", U.idle)}</div><div class="sub"><b style="color:#E5484D">${U.puliYoq}</b> puli yo'q · <b style="color:#D97706">${U.idle - U.puliYoq}</b> puli bor</div></div>
+  </section>
+  <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) 470px;gap:18px;min-height:0">
+    <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
+      <section class="card" style="padding:22px 28px 18px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div><div style="font-weight:800;font-size:28px">Kunlik sotuvlar</div><div style="font-size:17px;color:#64748B;margin-top:2px">Har bir ustun — o'sha kuni kiritilgan sotuvlar soni</div></div>
+          <div style="display:flex;gap:20px;font-size:16px;color:#475569;align-items:center">
+            <span><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:#10B981;margin-right:7px;vertical-align:-2px"></span>sotuvlar</span>
+            <span><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:#F59E0B;margin-right:7px;vertical-align:-2px"></span>rekord kun</span>
+            <span><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:repeating-linear-gradient(45deg,#10B981 0 3px,#D1FAE5 3px 7px);margin-right:7px;vertical-align:-2px"></span>bugun</span>
+            <span><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:#E9EDF3;margin-right:7px;vertical-align:-2px"></span>yakshanba</span>
+            ${U.ortacha ? `<span><span style="display:inline-block;width:22px;border-top:3px dashed #3B82F6;margin-right:7px;vertical-align:4px"></span>o'rtacha: <b>${U.ortacha}</b> / kun</span>` : ""}</div></div>
+        <div style="margin-top:8px">${grafik(k, U.ortacha)}</div>
+        <div style="display:grid;grid-template-columns:repeat(${Math.min(5, haftalar(k).split("</div>").length - 1)},minmax(0,1fr));gap:12px;margin-top:4px">${haftalar(k)}</div>
+      </section>
+      <section class="card" style="flex:1;padding:20px 28px 10px;min-height:0">
+        <table style="width:100%;border-collapse:collapse">
+          <tr><th style="font-size:22px;letter-spacing:0;text-transform:none;color:#0F172A">Tumanlar</th><th style="text-align:left;width:330px">Reja bajarilishi</th><th>Sotuv</th><th>Active</th><th>Idle</th><th>Puli yo'q</th><th>Bugun</th></tr>
+          ${tm.map((t) => { const h = D.tumanlar.find((x) => x.nom === t.nom) || {}, ok = (t.foiz ?? 0) >= 80;
+            return `<tr><td><b>${esc(t.nom)}</b></td><td style="text-align:left">${t.reja ? `<div style="display:flex;align-items:center;gap:12px"><div class="bar" style="flex:1"><div style="width:0;background:${ok ? "#10B981" : "#F59E0B"}" data-w="${Math.min(100, t.son * 100 / t.reja).toFixed(1)}"></div></div><span style="font-size:18px;color:#475569;white-space:nowrap">${t.son}/${t.reja}</span><b style="color:${ok ? "#059669" : "#D97706"};width:58px;text-align:right">${t.foiz}%</b></div>` : "—"}</td>
+              <td>${fmt(h.jami)}</td><td style="color:#059669;font-weight:700">${fmt(h.active)}</td><td style="color:#D97706;font-weight:700">${fmt(h.idle)}</td><td style="color:#E5484D">${fmt(h.puliYoq)}</td><td><b>${D.bugunTuman[t.nom] || 0}</b>${D.ulanganTuman[t.nom] ? ` <span style="font-size:15px;color:#059669">+${D.ulanganTuman[t.nom]} ulandi</span>` : ""}</td></tr>`; }).join("")}
+        </table>
+      </section>
+    </div>
+    <section class="card" style="padding:22px 26px;display:flex;flex-direction:column">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-weight:800;font-size:28px">TOP 10 sotuvchi</div><div style="font-size:16px;color:#64748B">shu oy shartnomalari</div></div>
+      <div style="display:flex;flex-direction:column;justify-content:space-between;flex:1;margin-top:6px;min-height:0">
+        ${D.top.map((o, i) => { const [bg, fg] = med[i] || ["transparent", "#64748B"];
+          return `<div style="display:flex;align-items:center;gap:14px;padding:4px 0;${i ? "border-top:1px solid #EEF1F6;" : ""}">
+            <div style="width:38px;height:38px;border-radius:11px;background:${bg};color:${fg};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0">${i + 1}</div>
+            <div style="flex:1;min-width:0"><div style="font-size:19px;font-weight:${i < 3 ? 700 : 600};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(o.nom)}${o.bugun ? `<span style="font-size:14px;font-weight:700;color:#047857;background:#D1FAE5;border-radius:999px;padding:3px 9px;margin-left:8px">+${o.bugun} bugun</span>` : ""}</div>
+              <div class="bar" style="height:6px;margin-top:6px"><div style="width:0;background:${i < 3 ? fg : "#10B981"}" data-w="${(o.son * 100 / maxTop).toFixed(0)}"></div></div></div>
+            <div style="font-weight:800;font-size:26px;width:44px;text-align:right">${o.son}</div></div>`; }).join("")}
+      </div>
+      ${P ? `<div style="margin-top:10px;background:#ECFDF5;border-radius:16px;padding:12px 16px;color:#065F46">
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#047857">Prognoz — oy oxiriga</span>
+          <span style="font-size:14px;color:#047857">${R.qolgan > 0 ? `${P.ish} ish kuni qoldi` : "Reja bajarildi! 🎉"}</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+          <div><div style="font-size:14px;color:#047857">hozirgi sur'atda</div><div style="font-size:26px;font-weight:800;line-height:1.1">${fmt(P.asos)} <span style="font-size:17px;font-weight:700">${pct(P.asos, R.jami)}%</span></div></div>
+          <div><div style="font-size:14px;color:#047857">+ puli yo'qlar 60–70% to'lasa</div><div style="font-size:26px;font-weight:800;line-height:1.1">${fmt(P.past)}–${fmt(P.yuqori)} <span style="font-size:17px;font-weight:700">${pct(P.past, R.jami) === pct(P.yuqori, R.jami) ? pct(P.past, R.jami) : pct(P.past, R.jami) + "–" + pct(P.yuqori, R.jami)}%</span></div></div></div></div>` : ""}
+    </section>
+  </div>
+  <footer class="card" style="height:52px;display:flex;align-items:center;gap:18px;padding:0 0 0 22px;overflow:hidden;font-size:18px">
+    <span style="background:#0F766E;color:#fff;font-weight:700;border-radius:10px;padding:6px 12px;font-size:15px;letter-spacing:.05em;flex-shrink:0;z-index:1">BUGUNGI SOTUVLAR</span>
+    <div style="overflow:hidden;flex:1">${D.oxirgi.length ? `<div class="tick">${[0, 1].map(() => D.oxirgi.map((s) => `<span><b>${esc(s.op)}</b> · ${esc(s.tuman)}</span><span style="color:#CBD5E1">●</span>`).join("")).join("")}</div>` : `<span style="color:#64748B">Bugun hali sotuv kiritilmagan</span>`}</div>
+  </footer>`;
+  soat();
+  // raqamlar eski qiymatdan yangisiga o'sadi, ustunlar va chiziqlar chiziladi
+  stage.querySelectorAll("[data-n]").forEach((el) => { const a = ESKI[el.dataset.k] ?? 0, b = Number(el.dataset.n), t0 = performance.now();
+    const st = (t) => { const q = Math.min(1, (t - t0) / 1400), e = 1 - Math.pow(1 - q, 3); el.textContent = fmt(Math.round(a + (b - a) * e)); if (q < 1) requestAnimationFrame(st); else ESKI[el.dataset.k] = b; };
+    requestAnimationFrame(st); });
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    stage.querySelectorAll("[data-w]").forEach((el) => (el.style.width = el.dataset.w + "%"));
+    stage.querySelectorAll(".grow").forEach((el, i) => setTimeout(() => (el.style.transform = "scaleY(1)"), i * 25));
+  }));
+}
+
+function soat() { const d = new Date(), s = $("soat"), z = $("sana"); if (!s) return;
+  s.textContent = d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tashkent" });
+  const t = new Date(d.toLocaleString("en-US", { timeZone: "Asia/Tashkent" }));
+  z.textContent = `${["yakshanba", "dushanba", "seshanba", "chorshanba", "payshanba", "juma", "shanba"][t.getDay()]}, ${t.getDate()}-${OYLAR[t.getMonth()]}`; }
+setInterval(soat, 10000);
+
+function bildirish(sarlavha, izoh) { const t = $("toast"); if (!t) return; $("toast-t").textContent = sarlavha; $("toast-s").textContent = izoh;
+  t.classList.add("on"); setTimeout(() => t.classList.remove("on"), 9000); }
+
+async function yukla() {
+  try {
+    const res = DEMO ? demo() : await (await fetch(API, { method: "POST", body: JSON.stringify({ action: "tv", kalit: KALIT }) })).json();
+    if (!res.ok) { if (!D) stage.innerHTML = `<div class="msg">${esc(res.error || "Ma'lumotni olib bo'lmadi")}</div>`; aloqa = !!D; return; }
+    const oldin = D ? D.umumiy.bugun : null;
+    D = res; aloqa = true; chiz();
+    if (oldin !== null && D.umumiy.bugun > oldin && D.oxirgi.length) {
+      const yangi = D.umumiy.bugun - oldin, s = D.oxirgi[0];
+      bildirish(yangi > 1 ? `${yangi} ta yangi sotuv!` : `Yangi sotuv! ${s.op}`, `${s.tuman} · bugungi ${D.umumiy.bugun}-sotuv`);
+    }
+  } catch (e) { aloqa = false; if (D) chiz(); else stage.innerHTML = `<div class="msg">Internet yoki server bilan aloqa yo'q. Qayta urinilmoqda...</div>`; }
+}
+// ish vaqtida (07:00–22:00) har 90 soniyada, kechasi har 15 daqiqada yangilanadi
+function rejala() { const h = Number(new Date().toLocaleString("en-GB", { hour: "2-digit", hour12: false, timeZone: "Asia/Tashkent" }));
+  setTimeout(async () => { await yukla(); rejala(); }, h >= 7 && h < 22 ? 90000 : 900000); }
+if (!KALIT && !DEMO) stage.innerHTML = `<div class="msg">Havolada TV kaliti yo'q. Botdan oling: 📊 Hisobotlar → 📺 Ofis TV dashboardi</div>`;
+else { yukla(); rejala(); }
+setTimeout(() => location.reload(), 6 * 3600 * 1000);  // har 6 soatda sahifa yangilanadi (xotira va yangi versiya uchun)
+
+// ?demo — o'ylab topilgan namunaviy raqamlar (haqiqiy ma'lumot emas)
+function demo() {
+  const k = [0, 9, 18, 15, 14, 20, 8, 0, 17, 16, 17, 20, 15, 8, 3, 21, 17, 20, 20, 24, 13, 0, 25, 24, 28, 21, 12 + Math.floor(Math.random() * 3)];
+  const tm = ["Tuman A", "Tuman B", "Tuman C"];
+  return { ok: true, vaqt: new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }), oy: "Noyabr 2026", sana: "28.11.2026", sbms: "27.11.2026 20:28",
+    umumiy: { jami: 412, active: 330, idle: 82, puliYoq: 40, bugun: k[k.length - 1], kecha: 21, bugunUlangan: 9, ortacha: 18, kunlik: k, oldingiActive: 12 },
+    reja: { jami: 450, bajarildi: 352, foiz: 78, qolgan: 98, puliBor: 30, puliYoq: 38, ishKunlari: 2, surat: 21.4,
+      tumanlar: [{ nom: tm[0], reja: 210, son: 178, foiz: 85 }, { nom: tm[1], reja: 70, son: 62, foiz: 89 }, { nom: tm[2], reja: 170, son: 112, foiz: 66 }] },
+    tumanlar: [{ nom: tm[0], jami: 200, active: 165, idle: 35, puliYoq: 15 }, { nom: tm[1], jami: 70, active: 62, idle: 8, puliYoq: 4 }, { nom: tm[2], jami: 142, active: 103, idle: 39, puliYoq: 21 }],
+    bugunTuman: { [tm[0]]: 6, [tm[1]]: 2, [tm[2]]: 4 }, ulanganTuman: { [tm[0]]: 4, [tm[2]]: 5 }, kechagi: 21,
+    top: Array.from({ length: 10 }, (_, i) => ({ nom: "Operator " + (i + 1), tuman: tm[i % 3], son: 21 - i, bugun: i % 3 === 0 ? 1 : 0 })),
+    oxirgi: Array.from({ length: 8 }, (_, i) => ({ op: "Operator " + (i + 1), tuman: tm[i % 3] })) };
+}
+</script>
+</body>
+</html>

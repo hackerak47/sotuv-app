@@ -209,7 +209,8 @@ function sahifaUmumiy() {
       ${R.tumanlar.map((t) => { const tm = D.tumanlar.find((x) => x.nom === t.nom) || {};
         return `<div><div class="between small"><b>${esc(t.nom)}</b><span>${N(t.son)} / ${t.reja} · <b style="color:${t.foiz >= 80 ? "var(--green2)" : "var(--orange)"}">${N(t.foiz, "%")}</b></span></div>
         <div class="track" style="margin-top:7px"><div class="fill" style="background:${t.foiz >= 80 ? "var(--green)" : "var(--orange2)"}" data-w="${Math.min(100, t.son * 100 / t.reja).toFixed(1)}"></div></div>
-        <div class="xs muted" style="margin-top:6px">sotuv ${tm.jami ?? "–"} · <span style="color:var(--green2)">active ${tm.active ?? "–"}</span> · <span style="color:var(--orange)">idle ${tm.idle ?? "–"}</span> · puli bor idle ${t.puliBor}</div></div>`; }).join("")}</section>`;
+        <div class="xs" style="margin-top:6px;font-weight:700;color:${t.son < t.reja ? "var(--red)" : "var(--green2)"}">${t.son < t.reja ? `Rejagacha ${t.reja - t.son} ta qoldi` : "Reja bajarildi ✓"}</div>
+        <div class="xs muted" style="margin-top:2px">sotuv ${tm.jami ?? "–"} · <span style="color:var(--green2)">active ${tm.active ?? "–"}</span> · <span style="color:var(--orange)">idle ${tm.idle ?? "–"}</span> · puli bor idle ${t.puliBor}</div></div>`; }).join("")}</section>`;
   }
   h += `<section class="card fade"><div class="between" style="margin-bottom:4px"><div class="ttl">TOP 5 sotuvchi</div><span class="xs muted">shu oy</span></div>
     ${(D.top || []).map((o, i) => `<div class="row" style="padding:9px 0;${i ? "border-top:1px solid var(--line)" : ""}">

@@ -202,6 +202,7 @@ function sahifaUmumiy() {
   h += `<section class="card fade"><div class="between"><div><div class="ttl">Kunlik sotuvlar</div><div class="xs muted">Har bir ustun — o'sha kuni kiritilgan sotuvlar soni</div></div>
     ${U.rekord.son ? `<span class="tag t-or">rekord ${U.rekord.son} · ${U.rekord.kun}-kun</span>` : ""}</div>
     ${grafik(U.kunlik, U.ortacha)}${haftalar(U.kunlik)}</section>`;
+  if (!D.admin) return h;  // tumanlar kesimi va TOP sotuvchilar faqat adminlarga
   if (R && R.tumanlar.length) {
     h += `<section class="card fade" style="display:flex;flex-direction:column;gap:14px"><div class="ttl">Tumanlar bo'yicha reja</div>
       ${R.tumanlar.map((t) => { const tm = D.tumanlar.find((x) => x.nom === t.nom) || {};
@@ -210,7 +211,7 @@ function sahifaUmumiy() {
         <div class="xs muted" style="margin-top:6px">sotuv ${tm.jami ?? "–"} · <span style="color:var(--green2)">active ${tm.active ?? "–"}</span> · <span style="color:var(--orange)">idle ${tm.idle ?? "–"}</span> · puli bor idle ${t.puliBor}</div></div>`; }).join("")}</section>`;
   }
   h += `<section class="card fade"><div class="between" style="margin-bottom:4px"><div class="ttl">TOP 5 sotuvchi</div><span class="xs muted">shu oy</span></div>
-    ${D.top.map((o, i) => `<div class="row" style="padding:9px 0;${i ? "border-top:1px solid var(--line)" : ""}">
+    ${(D.top || []).map((o, i) => `<div class="row" style="padding:9px 0;${i ? "border-top:1px solid var(--line)" : ""}">
       <div class="medal" style="background:${(medal[i] || ["#F8FAFC"])[0]};color:${(medal[i] || ["", "#64748B"])[1]}">${i + 1}</div>
       <div style="flex:1" class="ellip"><div style="font-weight:700;font-size:15px" class="ellip">${esc(o.nom)}</div><div class="xs muted">${esc(o.tuman)}</div></div>
       <div style="font-weight:800;font-size:20px">${N(o.son)}</div></div>`).join("")}</section>`;
